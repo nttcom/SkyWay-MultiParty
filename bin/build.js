@@ -12,7 +12,7 @@ var fs = require('fs')
  * @api private
  */
 
-var template = '/*! peerjs.%ext% build:' + package.version + ', %type%. Copyright(c) 2013 Michelle Bu <michelle@michellebu.com> */'
+var template = '/*! multiparty.%ext% build:' + package.version + ', %type%. Copyright(c) 2014 Kensaku Komatsu <kensaku.komatsu@gmail.com> */'
   , prefix = '\n(function(exports){\n'
   , development = template.replace('%type%', 'development').replace('%ext%', 'js')
   , production = template.replace('%type%', 'production').replace('%ext%', 'min.js')
@@ -38,17 +38,9 @@ var starttagIF = '// if node'
  */
 
 var base = [
-    '../deps/js-binarypack/lib/bufferbuilder.js'
-  , '../deps/js-binarypack/lib/binarypack.js'
-  , '../deps/EventEmitter/EventEmitter.js'
-  , '../deps/reliable/lib/reliable.js'
-  , 'adapter.js' 
-  , 'util.js'
-  , 'peer.js'
-  , 'dataconnection.js'
-  , 'mediaconnection.js'
-  , 'negotiator.js'
-  , 'socket.js'
+    '../deps/eventemitter2.js'
+  , '../deps/md5.js'
+  , 'MultiParty.js'
 
 ];
 
@@ -113,7 +105,7 @@ var builder = module.exports = function () {
       // concatinate the file contents in order
       var code = development
         , ignore = 0;
-        
+
       code += prefix;
 
       files.forEach(function (file) {
@@ -150,7 +142,7 @@ var builder = module.exports = function () {
       }
 
       code += suffix;
-      
+
       // check if we need to process it any further
       if (settings.minify) {
         var ast = uglify.parser.parse(code);
@@ -183,14 +175,14 @@ if (!module.parent){
   // build a development build
   builder(args.length ? args : false, { minify:false }, function (err, content) {
     if (err) return console.error(err);
-		console.log(__dirname);
+    console.log(__dirname);
     fs.write(
-        fs.openSync(__dirname + '/../dist/peer.js', 'w')
+        fs.openSync(__dirname + '/../dist/multiparty.js', 'w')
       , content
       , 0
       , 'utf8'
     );
-    console.log('Successfully generated the development build: peer.js');
+    console.log('Successfully generated the development build: multiparty.js');
   });
 
   // and build a production build
@@ -198,11 +190,11 @@ if (!module.parent){
     if (err) return console.error(err);
 
     fs.write(
-        fs.openSync(__dirname + '/../dist/peer.min.js', 'w')
+        fs.openSync(__dirname + '/../dist/multiparty.min.js', 'w')
       , content
       , 0
       , 'utf8'
     );
-    console.log('Successfully generated the production build: peer.min.js');
+    console.log('Successfully generated the production build: multiparty.min.js');
   });
 }

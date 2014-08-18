@@ -1,0 +1,17 @@
+{
+  "name": "multiparty",
+  "version": "0.0.0",
+  "description": "SkyWay library for multi party services",
+  "main": "index.js",
+  "bin": {
+    "multiparty": "build.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kensaku Komatsu",
+  "license": "MIT",
+  "devDependencies": {
+    "uglify-js": "~1.3.4"
+  }
+}
