@@ -38,8 +38,7 @@ multiparty.on('message', function(mesg) {
 ## sample site
 
 https://komasshu-skyway-sample.github.io/plugins/examples/multiparty.html
-
-[HTML](https://github.com/komasshu-skyway-sample/plugins/blob/master/examples/multiparty.html)
+( [HTML](https://github.com/komasshu-skyway-sample/plugins/blob/master/examples/multiparty.html) )
 
 ## library
 
