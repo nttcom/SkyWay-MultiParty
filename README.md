@@ -51,7 +51,7 @@ https://komasshu-skyway-sample.github.io/plugins/examples/multiparty.html
 
 ## known issues
 
-- FireFoxで、映像ストリームがうまく動作しません。
+- Fixed : ~~FireFoxで、映像ストリームがうまく動作しません。~~
 
 ## Copyright
 
