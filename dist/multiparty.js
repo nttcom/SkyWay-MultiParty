@@ -1378,6 +1378,7 @@ new function() {
       function(stream) {
         self.stream = stream;
         var url = window.URL.createObjectURL(self.stream);
+        console.dir(stream);
         self.video.setAttribute("src", url);
         self.video.setAttribute("id", "my-video");
         self.video.setAttribute("muted", true);
@@ -1400,10 +1401,12 @@ new function() {
 
     // API経由で取得したIDには、自分からcallする（caller）
     for( var peer_id in this.peers) {
-      var call = this.peer.call(peer_id, this.stream);
-      this.peers[peer_id].call = call;
+      (function(self){
+        var call = self.peer.call(peer_id, self.stream);
+        self.peers[peer_id].call = call;
 
-      this.setupStreamHandler_(call);
+        self.setupStreamHandler_(call);
+      }(self));
     };
 
 
@@ -1438,12 +1441,14 @@ new function() {
     var self = this;
     var video = document.createElement('video');
     var url = window.URL.createObjectURL(stream);
+
     video.setAttribute("id", peer_id);
     video.setAttribute("src", url);
     video.addEventListener("loadedmetadata", function(ev) {
-      video.play();
       self.peers[peer_id].video = video;
       self.fire_('peer_ms', video);
+      setTimeout(function(ev){ video.play(); }, 10);
+      // video.play();
     });
   }
 
