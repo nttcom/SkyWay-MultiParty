@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+</head>
+<body>
+  <div id="mocha"></div>
+  <!-- depndency -->
+  <script src="../deps/md5.js"></script>
+  <script src="../deps/eventemitter2.js"></script>
+
+  <!-- target library -->
+  <script src="../lib/MultiParty.js"></script>
+
+  <!-- load test framework -->
+  <script src="../node_modules/should/should.js"></script>
+  <script src="../node_modules/mocha/mocha.js"></script>
+
+  <script>mocha.setup('bdd');</script>
+
+  <!-- load test code -->
+  <script src="util.js"></script>
+
+  <!-- run test -->
+  <script>
+    mocha.run();
+  </script>
+</body>
+</html>

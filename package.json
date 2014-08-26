@@ -12,6 +12,8 @@
   "author": "Kensaku Komatsu",
   "license": "MIT",
   "devDependencies": {
+    "mocha": "^1.21.4",
+    "should": "^4.0.4",
     "uglify-js": "~1.3.4"
   }
 }

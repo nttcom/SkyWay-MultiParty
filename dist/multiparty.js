@@ -1255,14 +1255,13 @@ new function() {
     this.stream = null; // my media stream
     this.video = document.createElement("video"); // my video node
 
-    this.opts_ = opts;
+    this.opened = false;
 
     // option をチェック
     // room, myid, key プロパティを割り当てる
-    this.checkOpts_();
+    this.opts = MultiParty_.util.checkOpts_(opts);
 
     this.conn2SkyWay_();
-
   }
 
   // EventEmitterを継承する
@@ -1273,54 +1272,23 @@ new function() {
   // private method
 
 
-  // オプションのチェック
-  MultiParty_.prototype.checkOpts_ = function() {
-    // key check (なかったら throw)
-    if(!this.opts_.key || typeof(this.opts_.key) !== "string") {
-      throw "app key must be specified";
-    };
-    this.key = this.opts_.key;
-
-    // todo : room prefix にdomainを意識したほげほげ
-    // room check (なかったら "")
-    if(!this.opts_.room || typeof(this.opts_.room) !== "string") {
-      var seed = "";
-    } else {
-      var seed = this.opts_.room
-    };
-
-    seed += location.host + location.pathname;
-    this.room = CybozuLabs.MD5.calc(seed).substring(0,6) + "R_";
-
-    // id check (なかったら生成）
-    if(!this.opts_.id || typeof(this.opts_.id) !== "string") {
-      this.id = this.room + this.util.makeID();
-    }
-
-    // stream check
-    this.video_stream = (this.opts_.video === undefined ? true : this.opts_.video);
-    this.audio_stream = (this.opts_.audio === undefined ? true : this.opts_.audio);
-    this.stream = this.video_stream && this.audio_stream;
-  }
-
-
   // SkyWayサーバーに繋ぐ
   MultiParty_.prototype.conn2SkyWay_ = function() {
-    this.peer = new Peer(this.id, {key: this.key});
-    this.opened = false;
+    this.peer = new Peer(this.opts.id, {key: this.opts.key});
 
     // SkyWayサーバーへの接続が完了したら、open イベントを起こす
     this.peer.on('open', function(id) {
       if(this.opened) {
-        throw "connection to SkyWay is already opened";
+        throw "Error : connection to SkyWay is already opened";
       } else {
         this.opened = true;
       }
 
-      // todo: error check
-      console.log('open');
+      // id check
+      if(id !== this.opts.id) {
+        throw "Error : SkyWay returns wrong peer id for myself";
+      }
 
-      this.id = id;
       // open イベントを発火する
       this.fire_('open', id);
 
@@ -1328,7 +1296,10 @@ new function() {
       this.getIDs_();
     }.bind(this));
 
-    // todo : SkyWayサーバーへの接続が失敗した場合のerror処理
+    // SkyWayサーバーへの接続が失敗した場合のerror処理
+    this.peer.on("error", function(err) {
+      throw "Error : " + err;
+    });
   }
 
   // 接続中のIDを取得する
@@ -1336,7 +1307,7 @@ new function() {
     var xhr = new XMLHttpRequest();
     var self = this;
 
-    xhr.open('GET', 'https://skyway.io/v2/active/list/' + this.key);
+    xhr.open('GET', 'https://skyway.io/v2/active/list/' + this.opts.key);
 
     xhr.onload = function(ev) {
       // todo: error処理
@@ -1344,14 +1315,15 @@ new function() {
       var peers_ = JSON.parse(xhr.responseText);
 
       peers_.forEach(function(peer_id) {
-        // todo : Room check
-        if(peer_id !== self.id && peer_id.indexOf(self.room) === 0) {
+        // peer_idが自分のidではなく、かつ、peer_idの接頭辞がroom_idの場合
+        if(peer_id !== self.opts.id && peer_id.indexOf(self.opts.room_id) === 0) {
+          // 該当peer_id用のオブジェクトを初期化
           self.peers[peer_id] = {};
         }
       });
 
       // MediaStream処理を開始する
-      if(self.stream) {
+      if(self.opts.use_stream) {
         self.startMediaStream_();
       }
 
@@ -1374,19 +1346,18 @@ new function() {
   MultiParty_.prototype.startMyStream_ = function() {
     var self = this;
 
-    navigator.getUserMedia_({"video": self.video_stream, "audio": self.audio_stream},
+    navigator.getUserMedia_({"video": self.opts.video_stream, "audio": self.opts.audio_stream},
       function(stream) {
         self.stream = stream;
         var url = window.URL.createObjectURL(self.stream);
-        console.dir(stream);
         self.video.setAttribute("src", url);
         self.video.setAttribute("id", "my-video");
         self.video.setAttribute("muted", true);
 
         self.video.addEventListener("loadedmetadata", function(ev) {
           self.fire_('my_ms', self.video);
-          self.video.play();
           self.startCall_();
+          setTimeout(function(ev){ self.video.play(); }, 10);
         }, false);
       }, function(err) {
         throw err;
@@ -1430,6 +1401,10 @@ new function() {
       self.peers[this.peer].stream = stream;
       self.setupPeerVideo_(this.peer, stream);
     }).on('close', function(){
+      // todo : check skyway server to see this connection is disconnected.
+      // if disconnected : remove objects for this and fire.
+      // if not disconnected : recall media stream
+
       delete self.peers[this.peer];
       self.fire_('ms_close', this.peer);
     });
@@ -1448,7 +1423,6 @@ new function() {
       self.peers[peer_id].video = video;
       self.fire_('peer_ms', video);
       setTimeout(function(ev){ video.play(); }, 10);
-      // video.play();
     });
   }
 
@@ -1488,7 +1462,7 @@ new function() {
 
   // DataChannelのコネクション処理を行う
   MultiParty_.prototype.DCconnect_ = function(peer_id){
-    var conn = this.peer.connect(peer_id, {"serialization": "json", "reliable": true});
+    var conn = this.peer.connect(peer_id, {"serialization": "json", "reliable": this.opts.reliable});
     this.peers[peer_id].DCconn_sender = conn;
 
     conn.on('open', function() {
@@ -1502,6 +1476,9 @@ new function() {
     var self = this;
 
     conn.on('close', function() {
+      // todo : check skyway server to see this connection is disconnected.
+      // if disconnected : remove objects for this and fire.
+      // if not disconnected : reconnect datachannel
       if(self.peers[this.peer] && self.peers[this.peer].DCconn) {
         self.peers[this.peer].DCconn = null;
       }
@@ -1549,10 +1526,58 @@ new function() {
 
   /////////////////////////////////////
   // utility
-  MultiParty_.prototype.util = {};
+  MultiParty_.util = {};
+
+  // オプションのチェック
+  MultiParty_.util.checkOpts_ = function(opts_) {
+    var opts = {};
+
+    // key check (なかったら throw)
+    if(!opts_.key || typeof(opts_.key) !== "string") {
+      throw "app key must be specified";
+    };
+    opts.key = opts_.key;
+
+    // todo : room prefix にdomainを意識したほげほげ
+    // room check (なかったら "")
+    if(!opts_.room || typeof(opts_.room) !== "string") {
+      var seed = "";
+    } else {
+      var seed = opts_.room
+    };
+
+    opts.room_name = seed;
+
+    seed += location.host + location.pathname;
+
+    opts.room_id = CybozuLabs.MD5.calc(seed).substring(0,6) + "R_";
+
+    // id check (なかったら生成）
+    if(!opts_.id || typeof(opts_.id) !== "string") {
+      opts.id = opts.room_id + MultiParty_.util.makeID();
+    } else {
+      opts.id = opts.room_id + opts_.id;
+    }
+
+    // reliable check (なかったら false)
+    if(!opts_.reliable) {
+      opts.reliable = false;
+    } else {
+      opts.reliable = true;
+    }
+
+    // stream check
+    opts.video_stream = (opts_.video === undefined ? true : opts_.video);
+    opts.audio_stream = (opts_.audio === undefined ? true : opts_.audio);
+    opts.use_stream = opts.video_stream && opts.audio_stream;
+
+    return opts;
+  }
+
+
 
   // IDを作る
-  MultiParty_.prototype.util.makeID = function() {
+  MultiParty_.util.makeID = function() {
     var id = "";
 
     for (var i = 0; i < 32; i++) {
