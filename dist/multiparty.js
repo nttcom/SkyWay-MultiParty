@@ -1591,7 +1591,7 @@ new function() {
     // stream check
     opts.video_stream = (opts_.video === undefined ? true : opts_.video);
     opts.audio_stream = (opts_.audio === undefined ? true : opts_.audio);
-    opts.use_stream = opts.video_stream && opts.audio_stream;
+    opts.use_stream = opts.video_stream || opts.audio_stream;
 
     return opts;
   }
