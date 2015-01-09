@@ -1378,38 +1378,7 @@ new function() {
       (function(self){
         var call = self.peer.call(
           peer_id, 
-          self.stream,
-          {
-            "sdpTransform": function(sdp, conn) {
-              console.log(sdp);
-              if(true) return sdp;
-
-
-
-              if(conn.type !== "media") return sdp;
-
-              // chrome : http://stackoverflow.com/questions/20538698/minimum-sdp-for-making-a-h264-rtp-stream
-              // firefox : http://webrtcbook.com/sdp-h264.html
-              var ptype = util.browser === "Chrome" ? 101 : 128;
-
-              var ret = sdp.split("\r\n")
-                .map(function(line){
-                  if(util.browser === "Firefox" && line.match("VP8/90000")) { 
-                  // if(false) { 
-                    //return line+"\r\n" + "a=rtpmap:128 H264/90000\r\na=fmtp:128 profile-level-id=42e00c;packetization-mode=1";
-                    return [ 
-                      line,  // delete VP8
-                      "a=rtpmap:128 H264/90000\r\na=fmtp:128 profile-level-id=42e00c;packetization-mode=1"
-                    ].join("\r\n")
-                  } else {
-                    return line;
-                  }
-                }).filter(function(a){return a;}).join("\r\n")+"\r\n";
-              
-              console.log(ret);
-              return ret;
-            }
-          }
+          self.stream
         );
         self.peers[peer_id].call = call;
 
