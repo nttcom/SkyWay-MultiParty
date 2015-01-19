@@ -1254,6 +1254,7 @@ new function() {
     this.peers = {}; // peer Objects
     this.stream = null; // my media stream
     this.video = document.createElement("video"); // my video node
+    this.tracks_ = {};
 
     this.opened = false;
 
@@ -1267,13 +1268,14 @@ new function() {
   // EventEmitterを継承する
   MultiParty_.prototype = new EventEmitter2();
 
-
   ///////////////////////////////////
   // private method
 
 
   // SkyWayサーバーに繋ぐ
   MultiParty_.prototype.conn2SkyWay_ = function() {
+    var self = this;
+    
     this.peer = new Peer(this.opts.id, {
       "key": this.opts.key,
       "debug": false
@@ -1281,10 +1283,10 @@ new function() {
 
     // SkyWayサーバーへの接続が完了したら、open イベントを起こす
     this.peer.on('open', function(id) {
-      if(this.opened) {
+      if(self.opened) {
         throw "Error : connection to SkyWay is already opened";
       } else {
-        this.opened = true;
+        self.opened = true;
       }
 
       // id check
@@ -1352,6 +1354,12 @@ new function() {
     navigator.getUserMedia_({"video": self.opts.video_stream, "audio": self.opts.audio_stream},
       function(stream) {
         self.stream = stream;
+        if(self.opts.video_stream){
+          self.tracks_.video = stream.getVideoTracks()[0];
+        }
+        if(self.opts.audio_stream){
+          self.tracks_.audio = stream.getAudioTracks()[0];
+        }
         var url = window.URL.createObjectURL(self.stream);
         self.video.setAttribute("src", url);
         self.video.setAttribute("id", "my-video");
@@ -1367,6 +1375,35 @@ new function() {
       }
     );
   }
+  
+  // MediaTrackをmuteする
+  MultiParty_.prototype.mute = function(opts) {
+    if(opts === undefined) {
+      this.tracks_.audio.enabled = false;
+      this.tracks_.video.enabled = false;
+      return;
+    }
+    if(opts.audio !== undefined && opts.audio === true){
+      this.tracks_.audio.enabled = false;
+    }
+    if(opts.video !== undefined && opts.video === true){
+      this.tracks_.video.enabled = false;
+    }
+  };
+  
+  MultiParty_.prototype.unmute = function(opts) {
+    if(opts === undefined) {
+      this.tracks_.audio.enabled = true;
+      this.tracks_.video.enabled = true;
+      return;
+    }
+    if(opts.audio !== undefined && opts.audio === true){
+      this.tracks_.audio.enabled = true;
+    }
+    if(opts.video !== undefined && opts.video === true){
+      this.tracks_.video.enabled = true;
+    }
+  };
 
 
   // peersに対して、MediaStream callを開始する
