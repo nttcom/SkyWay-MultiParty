@@ -1244,7 +1244,7 @@ new function() {
   navigator.getUserMedia_ = navigator.getUserMedia
     || navigator.webkitGetUserMedia
     || navigator.mozGetUserMedia;
-
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
   // コンストラクタ
   var MultiParty_ = function(opts){
@@ -1255,6 +1255,7 @@ new function() {
     this.stream = null; // my media stream
     this.video = document.createElement("video"); // my video node
     this.tracks_ = {};
+    this.gainNode_;
 
     this.opened = false;
 
@@ -1353,7 +1354,23 @@ new function() {
 
     navigator.getUserMedia_({"video": self.opts.video_stream, "audio": self.opts.audio_stream},
       function(stream) {
-        self.stream = stream;
+        //Set up AudioContext and gain for browsers that support createMediaStreamSource properly
+        //Use the regular stream directly if it doesn't.
+        var audioContext = new AudioContext();
+        self.gainNode_ = audioContext.createGain();
+        var mic = audioContext.createMediaStreamSource(stream);
+        var peer = audioContext.createMediaStreamDestination();
+        if(peer.stream.addTrack) {
+          mic.connect(self.gainNode_);
+          self.gainNode_.connect(peer);
+          if(stream.getVideoTracks()){
+            peer.stream.addTrack(stream.getVideoTracks()[0]);
+          }
+          self.stream = peer.stream;
+        } else {
+          self.stream = stream;
+        }
+        
         if(self.opts.video_stream){
           self.tracks_.video = stream.getVideoTracks()[0];
         }
@@ -1381,24 +1398,41 @@ new function() {
     if(opts === undefined) {
       this.tracks_.audio.enabled = false;
       this.tracks_.video.enabled = false;
+      
+      if(this.gainNode_ !== undefined) {
+        this.gainNode_.gain.value = 0;
+      }
       return;
     }
     if(opts.audio !== undefined && opts.audio === true){
       this.tracks_.audio.enabled = false;
+      this.tracks_.audio.muted = true;
+
+      if(this.gainNode_ !== undefined) {
+        this.gainNode_.gain.value = 0;
+      }
     }
     if(opts.video !== undefined && opts.video === true){
       this.tracks_.video.enabled = false;
     }
   };
-  
+
   MultiParty_.prototype.unmute = function(opts) {
     if(opts === undefined) {
       this.tracks_.audio.enabled = true;
       this.tracks_.video.enabled = true;
+
+      if(this.gainNode_ !== undefined) {
+        this.gainNode_.gain.value = 3;
+      }
       return;
     }
     if(opts.audio !== undefined && opts.audio === true){
       this.tracks_.audio.enabled = true;
+
+      if(this.gainNode_ !== undefined) {
+        this.gainNode_.gain.value = 3;
+      }
     }
     if(opts.video !== undefined && opts.video === true){
       this.tracks_.video.enabled = true;
