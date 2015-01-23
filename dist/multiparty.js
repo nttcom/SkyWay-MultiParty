@@ -1310,22 +1310,11 @@ new function() {
 
   // 接続中のIDを取得する
   MultiParty_.prototype.getIDs_ = function() {
-    var xhr = new XMLHttpRequest();
     var self = this;
 
-    xhr.open('GET', 'https://skyway.io/v2/active/list/' + this.opts.key);
-
-    xhr.onload = function(ev) {
-      // todo: error処理
-
-      var peers_ = JSON.parse(xhr.responseText);
-
-      peers_.forEach(function(peer_id) {
-        // peer_idが自分のidではなく、かつ、peer_idの接頭辞がroom_idの場合
-        if(peer_id !== self.opts.id && peer_id.indexOf(self.opts.room_id) === 0) {
-          // 該当peer_id用のオブジェクトを初期化
-          self.peers[peer_id] = {};
-        }
+    self.listAllPeers(function(peers){
+      peers.forEach(function(peer_id){
+        self.peers[peer_id] = {};
       });
 
       // MediaStream処理を開始する
@@ -1335,9 +1324,7 @@ new function() {
 
       // DataChannel処理を開始する
       self.startDataChannel_();
-    };
-
-    xhr.send();
+    });
   }
 
   ////////////////////////////////////
@@ -1712,6 +1699,22 @@ new function() {
   // 切断する
   MultiParty_.prototype.close = function() {
     if(this.peer) this.peer.destroy();
+  }
+  
+  // 同じRoomのpeer listを取得
+  MultiParty_.prototype.listAllPeers = function(callback) {
+    var self = this;
+    this.peer.listAllPeers(
+      function(peers){
+        var roomPeers = [];
+        peers.forEach(function(peer_id) {
+          // peer_idが自分のidではなく、かつ、peer_idの接頭辞がroom_idの場合
+          if(peer_id !== self.opts.id && peer_id.indexOf(self.opts.room_id) === 0) {
+            roomPeers.push(peer_id);
+          }
+        });
+        callback(roomPeers);
+      });
   }
 
   // オブジェクトの宣言
