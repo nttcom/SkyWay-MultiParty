@@ -1502,6 +1502,26 @@ new function() {
       setTimeout(function(ev){ video.play(); }, 10);
     });
   }
+  
+  // peerのdcとmcを全てクローズする
+  MultiParty_.prototype.removePeer = function(peer_id) {
+    try{
+      if(this.peers[peer_id] !== undefined) {
+        var peer = this.peers[peer_id];
+        if(peer.call) {
+          peer.call.close();
+        }
+        if(peer.DCconn_receiver) {
+          peer.DCconn_receiver.close();
+        }
+        if(peer.DCconn_sender) {
+          peer.DCconn_sender.close();
+        }
+      }
+    } finally {
+      delete this.peers[peer_id];
+    }
+  }
 
 
   //////////////////////////////////
