@@ -1590,7 +1590,7 @@ new function() {
       return false;
     }
 
-    if(data && typeof(data) === "string" && data.lendth === 0) {
+    if(data && typeof(data) === "string" && data.length === 0) {
       return false;
     }
 
