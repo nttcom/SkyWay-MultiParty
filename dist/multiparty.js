@@ -1435,13 +1435,13 @@ new function() {
     for( var peer_id in this.peers) {
       (function(self){
         if(isScreen === true) {
-          if(!self.peers[peer_id].screen || self.peers[peer_id].screen.open) {
+          if(!self.peers[peer_id].screen_sender || self.peers[peer_id].screen_sender.open) {
             var call = self.peer.call(
                 peer_id,
                 self.screenStream,
                 {metadata:{type:'screen'}}
             );
-            self.peers[peer_id].screen = call;
+            self.peers[peer_id].screen_sender = call;
           }
         } else {
           var call = self.peer.call(
@@ -1456,28 +1456,30 @@ new function() {
 
 
     // 新規に接続してきたpeerからのcallを受け付けるハンドラ
-    this.peer.on('call', function(call) {
-      if(!self.peers[call.peer]) {
-        self.peers[call.peer] = {};
-      }
-      if(call.metadata && call.metadata.type === 'screen') {
-        self.peers[call.peer].screen = call;
-        call.answer();
-        self.setupStreamHandler_(call);
-      } else {
-        self.peers[call.peer].call = call;
-        call.answer(self.stream);
-        self.setupStreamHandler_(call);
-        if(self.screenStream !== undefined){
-          var call = self.peer.call(
-              peer_id,
-              self.screenStream,
-              {metadata:{type:'screen'}}
-          );
-          self.peers[peer_id].screen = call;
+    if(!this.peer._events.call || this.peer._events.call.length === 0) {
+      this.peer.on('call', function(call) {
+        if(!self.peers[call.peer]) {
+          self.peers[call.peer] = {};
         }
-      }
-    });
+        if(call.metadata && call.metadata.type === 'screen') {
+          self.peers[call.peer].screen_receiver = call;
+          call.answer();
+          self.setupStreamHandler_(call);
+        } else {
+          self.peers[call.peer].call = call;
+          call.answer(self.stream);
+          self.setupStreamHandler_(call);
+          if(self.screenStream !== undefined){
+            var call = self.peer.call(
+                call.peer,
+                self.screenStream,
+                {metadata:{type:'screen'}}
+            );
+            self.peers[call.peer].screen_sender = call;
+          }
+        }
+      });
+    }
   }
 
   // peerからのvideo stream, closeに対し、ハンドラをセットする
@@ -1486,7 +1488,7 @@ new function() {
 
     call.on('stream', function(stream) {
       if(call.metadata && call.metadata.type === 'screen') {
-        self.peers[this.peer].screen.stream = stream;
+        self.peers[this.peer].screen_receiver.stream = stream;
         self.setupPeerScreen_(this.peer, stream);
       } else {
         self.peers[this.peer].call.stream = stream;
@@ -1503,8 +1505,9 @@ new function() {
       } else {
         self.fire_('ms_close', this.peer);
       }
-      if((self.peers[this.peer].call === undefined || !self.peers[this.peer].call.open)
-          && (self.peers[this.peer].screen === undefined || !self.peers[this.peer].screen.open)) {
+      if(self.peers[this.peer] &&
+          (self.peers[this.peer].call === undefined || !self.peers[this.peer].call.open)
+          && (self.peers[this.peer].screen_sender === undefined || !self.peers[this.peer].screen_sender.open)) {
         delete self.peers[this.peer];
       }
     });
@@ -1536,7 +1539,7 @@ new function() {
     video.setAttribute("data-id", peer_id);
     video.setAttribute("src", url);
     video.addEventListener("loadedmetadata", function(ev) {
-      self.peers[peer_id].screen.video = video;
+      self.peers[peer_id].screen_receiver.video = video;
       self.fire_('peer_ss', video);
       setTimeout(function(ev){ video.play(); }, 10);
     });
@@ -1683,7 +1686,7 @@ new function() {
     // room check (なかったら "")
     if(!opts_.room || typeof(opts_.room) !== "string") {
       var seed = "";
-    } else if(!opts_.room.match(/^[0-9a-zA-Z]{4,32}$/)){
+    } else if(!opts_.room.match(/^[0-9a-zA-Z\-\_]{4,32}$/)){
       throw "room name should be digit|alphabet and length between 4 and 32";
     } else {
       var seed = opts_.room
@@ -1753,7 +1756,7 @@ new function() {
     if(this.peer) this.peer.destroy();
   }
   
-  MultiParty_.prototype.startScreenShare = function(callback) {
+  MultiParty_.prototype.startScreenShare = function(success, error) {
     if(this.peer) {
       var self = this;
       if(SkyWayPlugin && SkyWayPlugin.ScreenShare) {
@@ -1764,18 +1767,22 @@ new function() {
           self.startCall_(true);
           
           //callback use video
-          callback(stream);
-        });
+          success(stream);
+        }, error);
       }
     }
   }
   
   MultiParty_.prototype.stopScreenShare = function() {
-    this.screenStream = undefined;
-    for(var peer_id in this.peers){
-      if(this.peers[peer_id].screen) {
-        this.peers[peer_id].screen.close()
+    if(this.screenStream){
+      this.screenStream.stop();
+      for(var peer_id in this.peers){
+        if(this.peers[peer_id].screen_sender) {
+          this.peers[peer_id].screen_sender.close()
+        }
+        delete this.peers[peer_id].screen_sender;
       }
+    this.screenStream = undefined;
     }
   }
   
