@@ -1477,6 +1477,9 @@ new function() {
                 {metadata:{type:'screen'}}
             );
             self.peers[call.peer].screen_sender = call;
+            if(call.metadata && call.metadata.reconnect){
+              return;
+            }
           }
         }
       });
@@ -1840,6 +1843,52 @@ new function() {
       });
   }
 
+  MultiParty_.prototype.reconnect = function(peer_id, connections) {
+    var self = this;
+    var peer = self.peers[peer_id];
+    if(connections === undefined) {
+      connections = {
+        video: true,
+        screen: true,
+        data: true
+      }
+    }
+    if(peer) {
+      if(connections.video) {
+        self.peers[peer_id].call.close();
+        var call = self.peer.call(
+            peer_id,
+            self.stream,
+            {metadata: {reconnect: true}}
+        );
+        self.peers[peer_id].call = call;
+        self.setupStreamHandler_(call);
+      }
+      if(connections.screen) {
+        if(self.screenStream) {
+          self.peers[peer_id].screen_sender.close();
+          var call = self.peer.call(
+              peer_id,
+              self.screenStream,
+              {metadata: {reconnect: true, type: 'screen'}}
+          );
+          self.peers[peer_id].screen_sender = call;
+        }
+      }
+      if(connections.data) {
+        this.peers[peer_id].DCconn_sender.close();
+        var conn = this.peer.connect(peer_id,
+          {
+            "serialization": this.opts.serialization,
+            "reliable": this.opts.reliable,
+            "metadata": {reconnect: true}
+          }
+        );
+        this.peers[peer_id].DCconn_sender = conn;
+      }
+    }
+  }
+    
   // オブジェクトの宣言
   if (!global.MultiParty) {
     global.MultiParty = MultiParty_;
