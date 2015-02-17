@@ -1276,11 +1276,8 @@ new function() {
   // SkyWayサーバーに繋ぐ
   MultiParty_.prototype.conn2SkyWay_ = function() {
     var self = this;
-    
-    this.peer = new Peer(this.opts.id, {
-      "key": this.opts.key,
-      "debug": false
-    });
+
+    this.peer = new Peer(this.opts.id, this.opts.peerjs_opts);
 
     // SkyWayサーバーへの接続が完了したら、open イベントを起こす
     this.peer.on('open', function(id) {
@@ -1766,6 +1763,24 @@ new function() {
     opts.video_stream = (opts_.video === undefined ? true : opts_.video);
     opts.audio_stream = (opts_.audio === undefined ? true : opts_.audio);
     opts.use_stream = opts.video_stream || opts.audio_stream;
+
+    // peerjs options
+    opts.peerjs_opts = {
+      debug: false,
+      key: opts.key
+    };
+    if(opts_.host){
+      opts.peerjs_opts.host = opts_.host;
+    }
+    if(opts_.port){
+        opts.peerjs_opts.port = opts_.port;
+    }
+    if(opts_.secure){
+      opts.peerjs_opts.secure = opts_.secure;
+    }
+    if(opts_.config){
+      opts.peerjs_opts.config = opts_.config;
+    }
 
     return opts;
   }
