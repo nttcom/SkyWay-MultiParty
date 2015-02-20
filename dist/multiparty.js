@@ -1623,7 +1623,6 @@ new function() {
 
     //新規に接続してきたpeerからのconnection要求を受け付けるハンドラ
     this.peer.on('connection', function(conn) {
-      self.fire_('dc_receiver_open', conn.peer);
       if(!self.peers[conn.peer]) {
         self.peers[conn.peer] = {};
       }
@@ -1634,6 +1633,7 @@ new function() {
       }
 
       self.setupDCReceiveHandler_(conn);
+      self.fire_('dc_receiver_open', conn.peer);
     });
   }
 
@@ -1643,8 +1643,8 @@ new function() {
     this.peers[peer_id].DCconn_sender = conn;
 
     conn.on('open', function() {
-      this.fire_('dc_sender_open', peer_id);
       this.setupDCSenderHandler_(conn);
+      this.fire_('dc_sender_open', peer_id);
     }.bind(this));
   }
 
@@ -1732,9 +1732,7 @@ new function() {
 
     opts.room_name = seed;
 
-    seed += location.host + location.pathname;
-
-    opts.room_id = CybozuLabs.MD5.calc(seed).substring(0,6) + "R_";
+    opts.room_id = MultiParty_.util.makeRoomName(seed);
 
     // id check (なかったら生成）
     if(!opts_.id || typeof(opts_.id) !== "string") {
@@ -1766,7 +1764,7 @@ new function() {
 
     // peerjs options
     opts.peerjs_opts = {
-      debug: false,
+      debug: opts_.debug || false,
       key: opts.key
     };
     if(opts_.host){
@@ -1796,6 +1794,12 @@ new function() {
       id += String.fromCharCode( (Math.random() * (57 - 48) + 48) | 0)
     }
     return id;
+  }
+
+  MultiParty_.util.makeRoomName = function(seed) {
+      seed = seed || "";
+      seed += location.host + location.pathname;
+      return CybozuLabs.MD5.calc(seed).substring(0,6) + "R_";
   }
 
 
