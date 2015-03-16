@@ -1355,13 +1355,13 @@ new function() {
         }
 
         if(self.opts.video_stream){
-          self.tracks_.video = stream.getVideoTracks()[0];
+          self.tracks_.video = self.stream.getVideoTracks()[0];
         }
         if(self.opts.audio_stream){
-          self.tracks_.audio = stream.getAudioTracks()[0];
+          self.tracks_.audio = self.stream.getAudioTracks()[0];
         }
 
-        self.fire_('my_ms', stream);
+        self.fire_('my_ms', URL.createObjectURL(self.stream));
         self.startCall_();
 
       }, function(err) {
@@ -1545,12 +1545,12 @@ new function() {
     var self = this;
 
     if(isReconnect){
-        self.fire_('peer_rc', {id: peer_id, stream: stream});
+        self.fire_('peer_rc', {id: peer_id, src: URL.createObjectURL(stream)});
         return;
     }
 
     self.peers[peer_id].video = stream;
-    self.fire_('peer_ms', {id: peer_id, stream: stream});
+    self.fire_('peer_ms', {id: peer_id, src: URL.createObjectURL(stream)});
   }
 
   // peerのvideo Nodeをセットアップする
@@ -1559,7 +1559,7 @@ new function() {
     var self = this;
 
     self.peers[peer_id].screen_receiver.video = stream;
-    self.fire_('peer_ss', {stream: stream, id: peer_id});
+    self.fire_('peer_ss', {src: URL.createObjectURL(stream), id: peer_id});
   }
 
   // peerのdcとmcを全てクローズする
@@ -1570,11 +1570,8 @@ new function() {
         if(peer.call) {
           peer.call.close();
         }
-        if(peer.DCconn_receiver) {
-          peer.DCconn_receiver.close();
-        }
-        if(peer.DCconn_sender) {
-          peer.DCconn_sender.close();
+        if(peer.DCconn) {
+          peer.DCconn.close();
         }
       }
     } finally {
@@ -1605,52 +1602,35 @@ new function() {
       if(!self.peers[conn.peer]) {
         self.peers[conn.peer] = {};
       }
-      self.peers[conn.peer].DCconn_receiver = conn;
+      self.peers[conn.peer].DCconn = conn;
 
-      if(!self.peers[conn.peer].DCconn_sender) {
-        self.DCconnect_(conn.peer);
-      }
-
-      self.setupDCReceiveHandler_(conn);
-      self.fire_('dc_receiver_open', conn.peer);
+      self.setupDCHandler_(conn);
+      self.fire_('dc_open', conn.peer);
     });
   }
 
   // DataChannelのコネクション処理を行う
   MultiParty_.prototype.DCconnect_ = function(peer_id){
     var conn = this.peer.connect(peer_id, {"serialization": this.opts.serialization, "reliable": this.opts.reliable});
-    this.peers[peer_id].DCconn_sender = conn;
+    this.peers[peer_id].DCconn = conn;
 
     conn.on('open', function() {
-      this.setupDCSenderHandler_(conn);
-      this.fire_('dc_sender_open', peer_id);
+      this.setupDCHandler_(conn);
+      this.fire_('dc_open', peer_id);
     }.bind(this));
   }
 
-  // DataChannelのSenderイベントハンドラをセットする
-  MultiParty_.prototype.setupDCSenderHandler_ = function(conn) {
+  // DataChannelのイベントハンドラをセットする
+  MultiParty_.prototype.setupDCHandler_ = function(conn) {
     var self = this;
-
-    conn.on('close', function() {
+    conn.on('data', function(data) {
+      self.fire_('message', {"id": this.peer, "data": data});
+    }).on('close', function() {
       // todo : check skyway server to see this connection is disconnected.
       // if disconnected : remove objects for this and fire.
       // if not disconnected : reconnect datachannel
       if(self.peers[this.peer] && self.peers[this.peer].DCconn) {
-        self.peers[this.peer].DCconn = null;
-      }
-      self.fire_('dc_close', this.peer);
-    });
-  }
-
-  // DataChannelのReceiverイベントハンドラをセットする
-  MultiParty_.prototype.setupDCReceiveHandler_ = function(conn) {
-    var self = this;
-
-    conn.on('data', function(data) {
-      self.fire_('message', {"id": this.peer, "data": data});
-    }).on('close', function() {
-      if(self.peers[this.peer] && self.peers[this.peer].DCconn) {
-        self.peers[this.peer].DCconn = null;
+          self.peers[this.peer].DCconn = null;
       }
       self.fire_('dc_close', this.peer);
     });
@@ -1667,8 +1647,8 @@ new function() {
     }
 
     if(data && (typeof(data) === "string" || typeof(data) === "object")) {
-      for(var peer_id in this.peers) if(this.peers[peer_id].DCconn_sender) {
-        this.peers[peer_id].DCconn_sender.send(data);
+      for(var peer_id in this.peers) if(this.peers[peer_id].DCconn) {
+        this.peers[peer_id].DCconn.send(data);
       }
     }
   }
@@ -1874,7 +1854,7 @@ new function() {
         }
       }
       if(connections.data) {
-        this.peers[peer_id].DCconn_sender.close();
+        this.peers[peer_id].DCconn.close();
         var conn = this.peer.connect(peer_id,
           {
             "serialization": this.opts.serialization,
@@ -1882,7 +1862,7 @@ new function() {
             "metadata": {reconnect: true}
           }
         );
-        this.peers[peer_id].DCconn_sender = conn;
+        this.peers[peer_id].DCconn = conn;
       }
     }
   }
