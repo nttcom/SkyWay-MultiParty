@@ -1253,7 +1253,6 @@ new function() {
     this.key = null; // app key
     this.peers = {}; // peer Objects
     this.stream = null; // my media stream
-    this.video = document.createElement("video"); // my video node
     this.tracks_ = {};
     this.gainNode_;
 
@@ -1354,35 +1353,29 @@ new function() {
         } else {
           self.stream = stream;
         }
-        
+
         if(self.opts.video_stream){
           self.tracks_.video = stream.getVideoTracks()[0];
         }
         if(self.opts.audio_stream){
           self.tracks_.audio = stream.getAudioTracks()[0];
         }
-        var url = window.URL.createObjectURL(self.stream);
-        self.video.setAttribute("src", url);
-        self.video.setAttribute("id", "my-video");
-        self.video.setAttribute("muted", true);
 
-        self.video.addEventListener("loadedmetadata", function(ev) {
-          self.fire_('my_ms', self.video);
-          self.startCall_();
-          setTimeout(function(ev){ self.video.play(); }, 10);
-        }, false);
+        self.fire('my_ms', stream);
+        self.startCall_();
+
       }, function(err) {
         throw err;
       }
     );
   }
-  
+
   // MediaTrackをmuteする
   MultiParty_.prototype.mute = function(opts) {
     if(opts === undefined) {
       this.tracks_.audio.enabled = false;
       this.tracks_.video.enabled = false;
-      
+
       if(this.gainNode_ !== undefined) {
         this.gainNode_.gain.value = 0;
       }
@@ -1550,39 +1543,25 @@ new function() {
   // loadedmetadataが完了したら、'peer_video'をfireする
   MultiParty_.prototype.setupPeerVideo_ = function(peer_id, stream, isReconnect) {
     var self = this;
-    var video = document.createElement('video');
-    var url = window.URL.createObjectURL(stream);
-      
+
     if(isReconnect){
-        self.fire_('peer_rc', {id: peer_id, src: url});
+        self.fire_('peer_rc', {id: peer_id, src: stream});
         return;
     }
 
-    video.setAttribute("id", peer_id);
-    video.setAttribute("src", url);
-    video.addEventListener("loadedmetadata", function(ev) {
-      self.peers[peer_id].video = video;
-      self.fire_('peer_ms', video);
-      setTimeout(function(ev){ video.play(); }, 10);
-    });
+    self.peers[peer_id].video = stream;
+    self.fire_('peer_ms', stream);
   }
 
   // peerのvideo Nodeをセットアップする
   // loadedmetadataが完了したら、'peer_video'をfireする
   MultiParty_.prototype.setupPeerScreen_ = function(peer_id, stream) {
     var self = this;
-    var video = document.createElement('video');
-    var url = window.URL.createObjectURL(stream);
 
-    video.setAttribute("data-id", peer_id);
-    video.setAttribute("src", url);
-    video.addEventListener("loadedmetadata", function(ev) {
-      self.peers[peer_id].screen_receiver.video = video;
-      self.fire_('peer_ss', video);
-      setTimeout(function(ev){ video.play(); }, 10);
-    });
+    self.peers[peer_id].screen_receiver.video = stream;
+    self.fire_('peer_ss', stream);
   }
-  
+
   // peerのdcとmcを全てクローズする
   MultiParty_.prototype.removePeer = function(peer_id) {
     try{
@@ -1815,7 +1794,7 @@ new function() {
   MultiParty_.prototype.close = function() {
     if(this.peer) this.peer.destroy();
   }
-  
+
   MultiParty_.prototype.startScreenShare = function(success, error) {
     if(this.peer) {
       var self = this;
@@ -1825,14 +1804,14 @@ new function() {
         sc.getScreen(function (stream) {
           self.screenStream = stream;
           self.startCall_(true);
-          
+
           //callback use video
           success(stream);
         }, error);
       }
     }
   }
-  
+
   MultiParty_.prototype.stopScreenShare = function() {
     if(this.screenStream){
       this.screenStream.stop();
@@ -1845,7 +1824,7 @@ new function() {
     this.screenStream = undefined;
     }
   }
-  
+
   // 同じRoomのpeer listを取得
   MultiParty_.prototype.listAllPeers = function(callback) {
     var self = this;
@@ -1907,7 +1886,7 @@ new function() {
       }
     }
   }
-    
+
   // オブジェクトの宣言
   if (!global.MultiParty) {
     global.MultiParty = MultiParty_;
