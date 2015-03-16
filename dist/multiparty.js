@@ -1361,7 +1361,7 @@ new function() {
           self.tracks_.audio = stream.getAudioTracks()[0];
         }
 
-        self.fire('my_ms', stream);
+        self.fire_('my_ms', stream);
         self.startCall_();
 
       }, function(err) {
@@ -1545,12 +1545,12 @@ new function() {
     var self = this;
 
     if(isReconnect){
-        self.fire_('peer_rc', {id: peer_id, src: stream});
+        self.fire_('peer_rc', {id: peer_id, stream: stream});
         return;
     }
 
     self.peers[peer_id].video = stream;
-    self.fire_('peer_ms', stream);
+    self.fire_('peer_ms', {id: peer_id, stream: stream});
   }
 
   // peerのvideo Nodeをセットアップする
@@ -1559,7 +1559,7 @@ new function() {
     var self = this;
 
     self.peers[peer_id].screen_receiver.video = stream;
-    self.fire_('peer_ss', stream);
+    self.fire_('peer_ss', {stream: stream, id: peer_id});
   }
 
   // peerのdcとmcを全てクローズする
