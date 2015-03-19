@@ -1467,9 +1467,6 @@ new function() {
                 {metadata:{type:'screen'}}
             );
             self.peers[call.peer].screen_sender = call;
-            if(call.metadata && call.metadata.reconnect){
-              return;
-            }
           }
         }
       });
@@ -1491,9 +1488,8 @@ new function() {
       }
 
     }).on('close', function(){
-      // todo : check skyway server to see this connection is disconnected.
-      // if disconnected : remove objects for this and fire.
-      // if not disconnected : recall media stream
+      // handle peer close event
+      // check skyway server to see this user is disconnected.
       var peer_id = this.peer;
       var metadata = this.metadata;
       self.listAllPeers(function(list){
@@ -1510,29 +1506,21 @@ new function() {
               } else {
                   self.fire_('ms_close', peer_id);
               }
+              // check if user has any other open connections
               if(self.peers[peer_id] &&
-                  (self.peers[peer_id].call === undefined || !self.peers[peer_id].call.open)
-                  && (self.peers[peer_id].screen_sender === undefined || !self.peers[peer_id].screen_sender.open)) {
-                  delete self.peers[peer_id];
+                (self.peers[peer_id].call === undefined || !self.peers[peer_id].call.open) &&
+                (self.peers[peer_id].DCconn === undefined || !self.peers[peer_id].DCconn.open) &&
+                (self.peers[peer_id].screen_sender === undefined || !self.peers[peer_id].screen_sender.open)) {
+                  self.removePeer(peer_id);
               }
           } else {
+              // try to reconnect to user
               if(metadata && metadata.type === 'screen') {
                   if(self.screenStream) {
-                      metadata.reconnect = true;
-                      var call = self.peer.call(
-                          peer_id,
-                          self.screenStream,
-                          metadata
-                      );
-                      self.peers[peer_id].screen_sender = call;
+                      self.reconnect(peer_id, {screen: true});
                   }
               } else {
-                  var call = self.peer.call(
-                      peer_id,
-                      self.stream,
-                      {metadata:{reconnect:true}}
-                  );
-                  self.peers[peer_id].call = call;
+                  self.reconnect(peer_id, {video: true});
               }
           }
       });
@@ -1543,23 +1531,24 @@ new function() {
   // loadedmetadataが完了したら、'peer_video'をfireする
   MultiParty_.prototype.setupPeerVideo_ = function(peer_id, stream, isReconnect) {
     var self = this;
-
-    if(isReconnect){
-        self.fire_('peer_rc', {id: peer_id, src: URL.createObjectURL(stream)});
-        return;
+    if(!isReconnect){
+      isReconnect = false;
     }
 
     self.peers[peer_id].video = stream;
-    self.fire_('peer_ms', {id: peer_id, src: URL.createObjectURL(stream)});
+    self.fire_('peer_ms', {id: peer_id, src: URL.createObjectURL(stream), reconnect: isReconnect});
   }
 
   // peerのvideo Nodeをセットアップする
   // loadedmetadataが完了したら、'peer_video'をfireする
-  MultiParty_.prototype.setupPeerScreen_ = function(peer_id, stream) {
+  MultiParty_.prototype.setupPeerScreen_ = function(peer_id, stream, isReconnect) {
     var self = this;
+    if(!isReconnect){
+      isReconnect = false;
+    }
 
     self.peers[peer_id].screen_receiver.video = stream;
-    self.fire_('peer_ss', {src: URL.createObjectURL(stream), id: peer_id});
+    self.fire_('peer_ss', {src: URL.createObjectURL(stream), id: peer_id, reconnect: isReconnect});
   }
 
   // peerのdcとmcを全てクローズする
@@ -1569,6 +1558,12 @@ new function() {
         var peer = this.peers[peer_id];
         if(peer.call) {
           peer.call.close();
+        }
+        if(peer.screen_sender) {
+          peer.screen_sender.close();
+        }
+        if(peer.screen_receiver) {
+          peer.screen_receiver.close();
         }
         if(peer.DCconn) {
           peer.DCconn.close();
@@ -1616,7 +1611,7 @@ new function() {
 
     conn.on('open', function() {
       this.setupDCHandler_(conn);
-      this.fire_('dc_open', peer_id);
+      this.fire_('dc_open', conn.peer);
     }.bind(this));
   }
 
@@ -1626,13 +1621,32 @@ new function() {
     conn.on('data', function(data) {
       self.fire_('message', {"id": this.peer, "data": data});
     }).on('close', function() {
-      // todo : check skyway server to see this connection is disconnected.
-      // if disconnected : remove objects for this and fire.
-      // if not disconnected : reconnect datachannel
-      if(self.peers[this.peer] && self.peers[this.peer].DCconn) {
-          self.peers[this.peer].DCconn = null;
-      }
-      self.fire_('dc_close', this.peer);
+      // handle peer close event
+      // check skyway server to see this user is disconnected.
+      var peer_id = this.peer;
+      var metadata = this.metadata;
+      self.listAllPeers(function(list) {
+        var isDisconnected = true;
+        for (var index in list) {
+          if (list[index] === peer_id) {
+            isDisconnected = false;
+            break;
+          }
+        }
+        if(isDisconnected){
+          self.fire_('dc_close', this.peer);
+          // check if user has any other open connections
+          if(self.peers[peer_id] &&
+            (self.peers[peer_id].call === undefined || !self.peers[peer_id].call.open) &&
+            (self.peers[peer_id].DCconn === undefined || !self.peers[peer_id].DCconn.open) &&
+            (self.peers[peer_id].screen_sender === undefined || !self.peers[peer_id].screen_sender.open)) {
+            self.removePeer(peer_id);
+          }
+        } else {
+          // try to reconnect to user
+          self.reconnect(peer_id, {data: true});
+        }
+      });
     });
   }
 
@@ -1821,6 +1835,7 @@ new function() {
       });
   }
 
+  // ユーザに再接続する
   MultiParty_.prototype.reconnect = function(peer_id, connections) {
     var self = this;
     var peer = self.peers[peer_id];
@@ -1833,36 +1848,44 @@ new function() {
     }
     if(peer) {
       if(connections.video) {
-        self.peers[peer_id].call.close();
+        if(peer.call && peer.call.close){
+          peer.call.close();
+        }
         var call = self.peer.call(
             peer_id,
             self.stream,
             {metadata: {reconnect: true}}
         );
-        self.peers[peer_id].call = call;
+        peer.call = call;
         self.setupStreamHandler_(call);
       }
       if(connections.screen) {
         if(self.screenStream) {
-          self.peers[peer_id].screen_sender.close();
+          if(peer.screen_sender && peer.screen_sender.close){
+            peer.screen_sender.close();
+          }
           var call = self.peer.call(
               peer_id,
               self.screenStream,
               {metadata: {reconnect: true, type: 'screen'}}
           );
-          self.peers[peer_id].screen_sender = call;
+          peer.screen_sender = call;
         }
       }
       if(connections.data) {
-        this.peers[peer_id].DCconn.close();
+        if(peer.DCconn && peer.DCconn.close){
+          peer.DCconn.close();
+        }
         var conn = this.peer.connect(peer_id,
           {
             "serialization": this.opts.serialization,
             "reliable": this.opts.reliable,
             "metadata": {reconnect: true}
           }
-        );
-        this.peers[peer_id].DCconn = conn;
+        ).on('open', function(){
+          peer.DCconn = conn;
+          self.setupDCHandler_(conn);
+        });
       }
     }
   }
