@@ -1334,7 +1334,6 @@ new function() {
     var self = this;
     self.pollInterval = setInterval(function(){
       self.listAllPeers(function(newList){
-
         for(var peer_id in self.peers){
           var removeId = true;
           if(peer_id === undefined) {
@@ -1355,7 +1354,17 @@ new function() {
               data: peer.DCconn?!peer.DCconn.open:false
             };
             if(reconnect.video || reconnect.screen || reconnect.data) {
-              self.reconnect(peer_id, reconnect);
+              if(!peer.reconnectIndex_){
+                peer.reconnectIndex_ = 1;
+              } else {
+                peer.reconnectIndex_++;
+              }
+              // reconnect on powers of 2 minus (1, 2, 4, 8 ...)
+              if((peer.reconnectIndex_ & (peer.reconnectIndex_-1)) == 0){
+                self.reconnect(peer_id, reconnect);
+              }
+            } else {
+              peer.reconnectIndex_ = 0;
             }
           }
         };
@@ -1554,14 +1563,7 @@ new function() {
                   self.removePeer(peer_id);
               }
           } else {
-              // try to reconnect to user
-              if(metadata && metadata.type === 'screen') {
-                  if(self.screenStream) {
-                      self.reconnect(peer_id, {screen: true});
-                  }
-              } else {
-                  self.reconnect(peer_id, {video: true});
-              }
+              // leave reconnecting up to startPollingConnections_
           }
       });
     });
@@ -1683,8 +1685,7 @@ new function() {
             self.removePeer(peer_id);
           }
         } else {
-          // try to reconnect to user
-          self.reconnect(peer_id, {data: true});
+          // leave reconnecting up to startPollingConnections_
         }
       });
     });
