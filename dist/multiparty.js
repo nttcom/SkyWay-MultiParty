@@ -1410,7 +1410,7 @@ new function() {
           self.tracks_.audio = self.stream.getAudioTracks()[0];
         }
 
-        self.fire_('my_ms', URL.createObjectURL(self.stream));
+        self.fire_('my_ms', {"src": URL.createObjectURL(self.stream), "id": self.opts.id});
         self.startCall_();
 
       }, function(err) {
