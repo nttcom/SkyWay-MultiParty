@@ -1424,6 +1424,7 @@ new function() {
     var url = window.URL.createObjectURL(stream);
 
     video.setAttribute("id", peer_id);
+    video.setAttribute("class", "peer-videos");
     video.setAttribute("src", url);
     video.addEventListener("loadedmetadata", function(ev) {
       self.peers[peer_id].video = video;
