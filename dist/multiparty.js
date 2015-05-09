@@ -1569,27 +1569,18 @@ new function() {
     });
   }
 
-  // peerのvideo Nodeをセットアップする
-  // loadedmetadataが完了したら、'peer_video'をfireする
+  // peerのvideoのObjectURLを生成し、frontにpeer_msイベントを返す
   MultiParty_.prototype.setupPeerVideo_ = function(peer_id, stream, isReconnect) {
-    var self = this;
-    var video = document.createElement('video');
+    // prevent to call twice.
+    if(!!this.peers[peer_id].video) return;
+
     var url = window.URL.createObjectURL(stream);
 
-    video.setAttribute("id", peer_id);
-    video.setAttribute("class", "peer-videos");
-    video.setAttribute("src", url);
-    video.addEventListener("loadedmetadata", function(ev) {
-      self.peers[peer_id].video = video;
-      self.fire_('peer_ms', video);
-      setTimeout(function(ev){ video.play(); }, 10);
-    });
-    if(!isReconnect){
-      isReconnect = false;
-    }
+    // set isReconnect as boolean
+    isReconnect = !!isReconnect;
 
-    self.peers[peer_id].video = stream;
-    self.fire_('peer_ms', {id: peer_id, src: URL.createObjectURL(stream), reconnect: isReconnect});
+    this.peers[peer_id].video = stream;
+    this.fire_('peer_ms', {id: peer_id, src: url, reconnect: isReconnect});
   }
 
   // peerのvideo Nodeをセットアップする
