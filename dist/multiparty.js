@@ -1825,11 +1825,38 @@ new function() {
     return id;
   }
 
+  // room名を作る
   MultiParty_.util.makeRoomName = function(seed) {
       seed = seed || "";
       seed += location.host + location.pathname;
       return CybozuLabs.MD5.calc(seed).substring(0,6) + "R_";
   }
+
+  // video nodeを作る
+  MultiParty_.util.createVideoNode = function(video) {
+    var v_ = document.createElement("video");
+    v_.setAttribute("src", video.src);
+    v_.setAttribute("id", video.id);
+
+    var played = false;
+
+    v_.addEventListener("loadedmetadata", function(ev) {
+      played = true;
+      this.play();
+    }, false);
+
+    // since FF37 sometimes doesn't fire "loadedmetadata"
+    // work around is after 500msec, calling play();
+    setTimeout(function(ev){
+      if(!played) {
+        played = true;
+        v_.play();
+      }
+    }, 500);
+
+    return v_;
+  }
+
 
 
 
@@ -1846,6 +1873,7 @@ new function() {
     clearInterval(this.pollInterval);
   }
 
+  // 画面共有を開始する
   MultiParty_.prototype.startScreenShare = function(success, error) {
     if(this.peer) {
       var self = this;
@@ -1863,6 +1891,7 @@ new function() {
     }
   }
 
+  // 画面共有を停止する
   MultiParty_.prototype.stopScreenShare = function() {
     if(this.screenStream){
       this.screenStream.stop();
@@ -1946,6 +1975,10 @@ new function() {
       }
     }
   }
+
+  
+
+
 
   // オブジェクトの宣言
   if (!global.MultiParty) {
