@@ -16,12 +16,19 @@ multiparty = new MultiParty( {
 //
 
 multiparty.on('my_ms', function(video) {
-  $(video).appendTo("#streams");  /* 自分のVideoを表示 */
+  // 自分のvideoを表示
+  var vNode = MultiParty.util.createVideoNode(video);
+  vNode.volume = 0;
+  $(vNode).appendTo("#streams");
 }).on('peer_ms', function(video) {
-  $(video).appendTo("#streams");  /* 相手のVideoを表示 */
+  // peerのvideoを表示
+  var vNode = MultiParty.util.createVideoNode(video);
+  $(vNode).appendTo("#streams");
 }).on('ms_close', function(peer_id) {
-  $("#"+peer_id).remove();  /* 相手からの接続が切れたら、ビデオを削除 */
+  // peerが切れたら、対象のvideoノードを削除する
+  $("#"+peer_id).remove();
 })
+
 
 // for DataChannel
 //
