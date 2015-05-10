@@ -4,7 +4,7 @@
 
 SkyWay( http://nttcom.github.io/skyway/ )を用い、マルチパーティのビデオチャットを簡単に開発できるライブラリ。
 
-## sample code
+## sample snipet
 
 ```javascript
 // MultiParty インスタンスを生成
