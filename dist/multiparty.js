@@ -1734,18 +1734,8 @@ new function() {
     if(!opts_.key.match(/^[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}$/)) {
       throw "wrong string pattern of app key";
     };
-    opts.options = {}
-    opts.options.key = opts_.key;
-
-    // host, port, path, secure, turn, config, debug
-    var keys = ["host", "port", "path", "secure", "turn", "config", "debug"];
-    keys.forEach(function(key) {
-      if(!!opts_[key]) opts.options[key] = opts_[key];
-    });
-
-    if(typeof(opts.options.debug) === "undefined") {
-      opts.options.debug = false;
-    }
+   // copy key
+    opts.key = opts_.key;
 
     // todo : room prefix にdomainを意識したほげほげ
     // room check (なかったら "")
