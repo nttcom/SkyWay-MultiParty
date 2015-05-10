@@ -49,6 +49,15 @@ https://komasshu-skyway-sample.github.io/plugins/examples/multiparty.html
 
 作成中・・・
 
+### how to indicate other ICE servers
+
+```javascript
+      multiparty = new MultiParty( {
+        "key": "737ae99a-5d87-11e3-9c76-1506fbcc2da2",
+        "config": { 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }
+      });
+```
+
 ## known issues
 
 - Fixed : ~~FireFoxで、映像ストリームがうまく動作しません。~~
