@@ -4,12 +4,12 @@
 
 SkyWay( http://nttcom.github.io/skyway/ )を用い、マルチパーティのビデオチャットを簡単に開発できるライブラリ。
 
-## sample code
+## sample snipet
 
 ```javascript
 // MultiParty インスタンスを生成
 multiparty = new MultiParty( {
-  "key": "737ae99a-5d87-11e3-9c76-1506fbcc2da2"  /* SkyWay keyを指定 */
+  "key": "********-****-****-****-************"  /* SkyWay keyを指定 */
 });
 
 // for MediaStream
