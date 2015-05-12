@@ -6,7 +6,7 @@ SkyWay( http://nttcom.github.io/skyway/ )を用い、マルチパーティのビ
 
 ## sample snipet
 
-```
+```javascript
 // MultiParty インスタンスを生成
 multiparty = new MultiParty( {
   "key": "********-****-****-****-************"  /* SkyWay keyを指定 */
@@ -56,7 +56,7 @@ multiparty.on('message', function(mesg) {
 
 ### MultiParty
 
-```
+```javascript
 var multiparty = new MultiParty([options]);
 ```
 
@@ -99,56 +99,118 @@ var multiparty = new MultiParty([options]);
 	
 ### multiparty.on
 
-```
+```javascript
 multiparty.on(event, callback);
 ```
 
 - 'open'
-```
+```javascript
 multiparty.on('open', function(myid){ ... });
 ```
 	- Emitted when a connection to SkyWay server has established. **id** indicates id of current window.
 - 'my_ms'
-```
+```javascript
 multiparty.on('my_ms', function({"src": <object url>, "id": <myid>}){...});
 ```
 	- Emitted when this window's video/audio stream has setuped. **object url** is the url for captured stream. **id** is current window's id.
 - 'peer_ms'
-```
+```javascript
 multiparty.on('peer_ms', function({"src": <object url>, "id": <peer-id>, "reconnect": <true or false>}){ ... });
 ```
 	- Emitted when peer's av stream has setuped.
 - 'peer_ss'
-```
+```javascript
 multiparty.on('peer_ss', function({"src": <object url>, "id": <peer-id>, "reconnect": <true or false>}){ ... });
 ```
 	- Emitted when peer's screen captrure stream has setuped.
 - 'ms_close'
-```
+```javascript
 multiparty.on('ms_close', function(peer-id){ ... });
 ```
 	- Emitted when peer's media stream has closed.
 - 'ss_close'
-```
+```javascript
 multiparty.on('ss_close', function(peer-id){ ... });
 ```
 	- Emitted when peer's screen cast stream has closed.
 - 'dc_open'
-```
+```javascript
 multiparty.on('dc_open', function(peer-id){ ... });
 ```
 	- Emitted when the connection for data channel with peer is setuped.
 - 'message'
-```
+```javascript
 multiparty.on('message', function({"id": <peer-id>, "data": <data>}){ ... });
 ```
 	- Emitted when receive message from peer.
 - 'dc_close'
-```
+```javascript
 multiparty.on('dc_close', function(peer-id){ ... });
 ```
 	- Emitted when data connection has closed with peer.
 
+### mute
+
+```javascript
+multiparty.mute({"video": <true of false>, "audio": <true or false>);
+```
+
+### unmute
+
+```javascript
+multiparty.unmute({"video": <true of false>, "audio": <true or false>);
+```
+
+### removePeer
+
+```javascript
+multiparty.removePeer(peer-id);
+```
+
+### send
+
+```javascript
+multiparty.send(data);
+```
+
+### close
+
+```javascript
+multiparty.close();
+```
+
+### startScreenShare
+
+```javascript
+multiparty.startScreenShare(function(stream){
+	// success callback
+}, function(err) {
+	// error callback
+});
+
+### stopScreenShare
+
+```javascript
+multiparty.stopScreenShare();
+```
+
+### listAllPeers
+
+```javascript
+multiparty.listAllPeers(function(lists) { ... });
+```
+
+### reconnect
+
+```javascript
+multiparty.reconnect(peer_id, function({"video": <boolean>, "screen": <boolean>, "data": <boolean>}){ ... });
+```
+
+### createVideoNode
+
+```javascript
+var vNode = multiparty.createVideoNode({"src": object_url, "id": peer_id}){ ... });
+```
 
 
 ## known issues
