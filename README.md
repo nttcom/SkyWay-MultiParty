@@ -97,6 +97,58 @@ var multiparty = new MultiParty([options]);
 	- config (object)
 		- passed to RTCPeerConnection. it indicates custom ICE server configuration. Defaults to ```{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }```.
 	
+### multiparty.on
+
+```
+multiparty.on(event, callback);
+```
+
+- 'open'
+```
+multiparty.on('open', function(myid){ ... });
+```
+	- Emitted when a connection to SkyWay server has established. **id** indicates id of current window.
+- 'my_ms'
+```
+multiparty.on('my_ms', function({"src": <object url>, "id": <myid>}){...});
+```
+	- Emitted when this window's video/audio stream has setuped. **object url** is the url for captured stream. **id** is current window's id.
+- 'peer_ms'
+```
+multiparty.on('peer_ms', function({"src": <object url>, "id": <peer-id>, "reconnect": <true or false>}){ ... });
+```
+	- Emitted when peer's av stream has setuped.
+- 'peer_ss'
+```
+multiparty.on('peer_ss', function({"src": <object url>, "id": <peer-id>, "reconnect": <true or false>}){ ... });
+```
+	- Emitted when peer's screen captrure stream has setuped.
+- 'ms_close'
+```
+multiparty.on('ms_close', function(peer-id){ ... });
+```
+	- Emitted when peer's media stream has closed.
+- 'ss_close'
+```
+multiparty.on('ss_close', function(peer-id){ ... });
+```
+	- Emitted when peer's screen cast stream has closed.
+- 'dc_open'
+```
+multiparty.on('dc_open', function(peer-id){ ... });
+```
+	- Emitted when the connection for data channel with peer is setuped.
+- 'message'
+```
+multiparty.on('message', function({"id": <peer-id>, "data": <data>}){ ... });
+```
+	- Emitted when receive message from peer.
+- 'dc_close'
+```
+multiparty.on('dc_close', function(peer-id){ ... });
+```
+	- Emitted when data connection has closed with peer.
+
 
 
 ## known issues
