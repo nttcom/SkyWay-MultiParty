@@ -6,7 +6,7 @@ SkyWay( http://nttcom.github.io/skyway/ )を用い、マルチパーティのビ
 
 ## sample snipet
 
-```javascript
+```
 // MultiParty インスタンスを生成
 multiparty = new MultiParty( {
   "key": "********-****-****-****-************"  /* SkyWay keyを指定 */
@@ -44,7 +44,7 @@ multiparty.on('message', function(mesg) {
 
 ## sample site
 
-https://komasshu-skyway-sample.github.io/plugins/examples/multiparty.html
+- https://komasshu-skyway-sample.github.io/plugins/examples/multiparty.html
 ( [HTML](https://github.com/komasshu-skyway-sample/plugins/blob/master/examples/multiparty.html) )
 
 ## library
@@ -54,7 +54,50 @@ https://komasshu-skyway-sample.github.io/plugins/examples/multiparty.html
 
 ## API reference
 
-作成中・・・
+### MultiParty
+
+```
+var multiparty = new MultiParty([options]);
+```
+
+- options
+	- key (string)
+		- an API key obtained from [skyway](https://skyway.io/ds/)
+	- room (string)
+		- room name
+	-  id (string)
+		- user id
+	- reliable (boolean)
+		- **true** indicates reliable data transfer (data channel). ```default : false```
+	- selialization (string)
+		- set data selialization mode ( binary | binary-utf8 | json | none ). ```default : binary```
+	- video (boolean)
+		- **true** indicates video streaming is enabled.```default: true```
+	- audio (boolean)
+		- **true** indicates audio streaming is enabled. ```default: true```
+	- polling (boolean)
+		- **true** indicates check user list via server polling. ```default: true```
+	- polling_interval (number)
+		- polling interval in msec order. ```default: 3000```
+	- debug (number)
+		- debug log level appeared in console.
+		
+		```
+		0 Prints no logs.
+		1 Prints only errors.
+		2 Prints errors and warnings.
+		3 Prints all logs.
+		```
+	- host (string)
+		- peer server host name.
+	- port (number)
+		- peer server port number.
+	- secure (boolean)
+		- true means peer server provide tls.
+	- config (object)
+		- passed to RTCPeerConnection. it indicates custom ICE server configuration. Defaults to ```{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }```.
+	
+
 
 ## known issues
 
