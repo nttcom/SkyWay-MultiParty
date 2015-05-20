@@ -1747,7 +1747,7 @@ new function() {
     if(!opts_.key.match(/^[0-9a-z]{8}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{4}\-[0-9a-z]{12}$/)) {
       throw "wrong string pattern of app key";
     };
-    // copy key
+   // copy key
     opts.key = opts_.key;
 
     // todo : room prefix にdomainを意識したほげほげ
