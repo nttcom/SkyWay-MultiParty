@@ -1833,8 +1833,10 @@ new function() {
     var played = false;
 
     v_.addEventListener("loadedmetadata", function(ev) {
-      played = true;
-      this.play();
+      if(!played) {
+        played = true;
+        this.play();
+      }
     }, false);
 
     // since FF37 sometimes doesn't fire "loadedmetadata"
@@ -1968,7 +1970,7 @@ new function() {
     }
   }
 
-  
+
 
 
 
