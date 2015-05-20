@@ -1263,7 +1263,14 @@ new function() {
     // room, myid, key プロパティを割り当てる
     this.opts = MultiParty_.util.checkOpts_(opts);
 
-    this.conn2SkyWay_();
+    // [work around] when reloaded, server doesn't recognize that
+    //  former connection was disconnected. but new request for
+    //  connection happened then kinds of issue happens. to prevent,
+    //  wait 750msec.
+    var self = this;
+    setTimeout( function(){
+      self.conn2SkyWay_();
+    }, 750);
   }
 
   // EventEmitterを継承する
@@ -1315,6 +1322,7 @@ new function() {
     var self = this;
 
     self.listAllPeers(function(peers){
+      console.log(peers);
       peers.forEach(function(peer_id){
         self.peers[peer_id] = {};
       });
@@ -1339,6 +1347,7 @@ new function() {
           if(peer_id === undefined) {
             return;
           }
+          // [fixme] this libraries has to have jquery library.
           $.each(newList, function(j, peerId){
             if(peer_id === peerId) {
             removeId = false;
@@ -1347,7 +1356,7 @@ new function() {
           if(removeId) {
             self.removePeer(peer_id);
           } else {
-            var peer = multiparty.peers[peer_id];
+            var peer = self.peers[peer_id];
             var reconnect = {
               video: peer.call?!peer.call.open:false,
               screen: peer.screen_sender?!peer.screen_sender.open:false,
@@ -1539,10 +1548,14 @@ new function() {
     }).on('close', function(){
       // handle peer close event
       // check skyway server to see this user is disconnected.
+
+
       var peer_id = this.peer;
       var metadata = this.metadata;
+      console.log("close", peer_id, metadata);
       self.listAllPeers(function(list){
           var isDisconnected = true;
+
           for(var index in list) {
               if(list[index] === peer_id) {
                   isDisconnected = false;
@@ -1920,6 +1933,8 @@ new function() {
     var self = this;
     var peer = self.peers[peer_id];
     if(connections === undefined) {
+      // [fixme] connections property doesn't care about original
+      // options.
       connections = {
         video: true,
         screen: true,
