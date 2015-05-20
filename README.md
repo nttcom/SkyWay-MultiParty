@@ -9,7 +9,8 @@ SkyWay( http://nttcom.github.io/skyway/ )を用い、マルチパーティのビ
 ```javascript
 // MultiParty インスタンスを生成
 multiparty = new MultiParty( {
-  "key": "********-****-****-****-************"  /* SkyWay keyを指定 */
+  "key": "********-****-****-****-************"  /* SkyWay keyを指定 */,
+  "reliable": true /* data channel でreliable通信(sctp)を行う */
 });
 
 // for MediaStream
@@ -61,42 +62,42 @@ var multiparty = new MultiParty([options]);
 ```
 
 - options
-	- key (string)
-		- an API key obtained from [skyway](https://skyway.io/ds/)
-	- room (string)
-		- room name
-	-  id (string)
-		- user id
-	- reliable (boolean)
-		- **true** indicates reliable data transfer (data channel). ```default : false```
-	- selialization (string)
-		- set data selialization mode ( binary | binary-utf8 | json | none ). ```default : binary```
-	- video (boolean)
-		- **true** indicates video streaming is enabled.```default: true```
-	- audio (boolean)
-		- **true** indicates audio streaming is enabled. ```default: true```
-	- polling (boolean)
-		- **true** indicates check user list via server polling. ```default: true```
-	- polling_interval (number)
-		- polling interval in msec order. ```default: 3000```
-	- debug (number)
-		- debug log level appeared in console.
-		
-		```
-		0 Prints no logs.
-		1 Prints only errors.
-		2 Prints errors and warnings.
-		3 Prints all logs.
-		```
-	- host (string)
-		- peer server host name.
-	- port (number)
-		- peer server port number.
-	- secure (boolean)
-		- true means peer server provide tls.
-	- config (object)
-		- passed to RTCPeerConnection. it indicates custom ICE server configuration. Defaults to ```{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }```.
-	
+  - key (string)
+    - an API key obtained from [skyway](https://skyway.io/ds/)
+  - room (string)
+    - room name
+  -  id (string)
+    - user id
+  - reliable (boolean)
+    - **true** indicates reliable data transfer (data channel). ```default : false```
+  - selialization (string)
+    - set data selialization mode ( binary | binary-utf8 | json | none ). ```default : binary```
+  - video (boolean)
+    - **true** indicates video streaming is enabled.```default: true```
+  - audio (boolean)
+    - **true** indicates audio streaming is enabled. ```default: true```
+  - polling (boolean)
+    - **true** indicates check user list via server polling. ```default: true```
+  - polling_interval (number)
+    - polling interval in msec order. ```default: 3000```
+  - debug (number)
+    - debug log level appeared in console.
+
+    ```
+    0 Prints no logs.
+    1 Prints only errors.
+    2 Prints errors and warnings.
+    3 Prints all logs.
+    ```
+  - host (string)
+    - peer server host name.
+  - port (number)
+    - peer server port number.
+  - secure (boolean)
+    - true means peer server provide tls.
+  - config (object)
+    - passed to RTCPeerConnection. it indicates custom ICE server configuration. Defaults to ```{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }```.
+
 ### multiparty.on
 
 ```javascript
@@ -107,47 +108,47 @@ multiparty.on(event, callback);
 ```javascript
 multiparty.on('open', function(myid){ ... });
 ```
-	- Emitted when a connection to SkyWay server has established. **id** indicates id of current window.
+  - Emitted when a connection to SkyWay server has established. **id** indicates id of current window.
 - 'my_ms'
 ```javascript
 multiparty.on('my_ms', function({"src": <object url>, "id": <myid>}){...});
 ```
-	- Emitted when this window's video/audio stream has setuped. **object url** is the url for captured stream. **id** is current window's id.
+  - Emitted when this window's video/audio stream has setuped. **object url** is the url for captured stream. **id** is current window's id.
 - 'peer_ms'
 ```javascript
 multiparty.on('peer_ms', function({"src": <object url>, "id": <peer-id>, "reconnect": <true or false>}){ ... });
 ```
-	- Emitted when peer's av stream has setuped.
+  - Emitted when peer's av stream has setuped.
 - 'peer_ss'
 ```javascript
 multiparty.on('peer_ss', function({"src": <object url>, "id": <peer-id>, "reconnect": <true or false>}){ ... });
 ```
-	- Emitted when peer's screen captrure stream has setuped.
+  - Emitted when peer's screen captrure stream has setuped.
 - 'ms_close'
 ```javascript
 multiparty.on('ms_close', function(peer-id){ ... });
 ```
-	- Emitted when peer's media stream has closed.
+  - Emitted when peer's media stream has closed.
 - 'ss_close'
 ```javascript
 multiparty.on('ss_close', function(peer-id){ ... });
 ```
-	- Emitted when peer's screen cast stream has closed.
+  - Emitted when peer's screen cast stream has closed.
 - 'dc_open'
 ```javascript
 multiparty.on('dc_open', function(peer-id){ ... });
 ```
-	- Emitted when the connection for data channel with peer is setuped.
+  - Emitted when the connection for data channel with peer is setuped.
 - 'message'
 ```javascript
 multiparty.on('message', function({"id": <peer-id>, "data": <data>}){ ... });
 ```
-	- Emitted when receive message from peer.
+  - Emitted when receive message from peer.
 - 'dc_close'
 ```javascript
 multiparty.on('dc_close', function(peer-id){ ... });
 ```
-	- Emitted when data connection has closed with peer.
+  - Emitted when data connection has closed with peer.
 
 ### mute
 
@@ -183,9 +184,9 @@ multiparty.close();
 
 ```javascript
 multiparty.startScreenShare(function(stream){
-	// success callback
+  // success callback
 }, function(err) {
-	// error callback
+  // error callback
 });
 
 ### stopScreenShare
