@@ -1266,7 +1266,7 @@ new function() {
     var self = this;
     setTimeout(function(ev){
       self.conn2SkyWay_();
-    }, 750);
+    }, 2500);
   }
 
   // EventEmitterを継承する
