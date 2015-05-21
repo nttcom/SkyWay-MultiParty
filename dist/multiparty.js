@@ -1266,7 +1266,7 @@ new function() {
     var self = this;
     setTimeout(function(ev){
       self.conn2SkyWay_();
-    }, 2500);
+    }, 0);
   }
 
   // EventEmitterを継承する
@@ -1280,14 +1280,15 @@ new function() {
   MultiParty_.prototype.conn2SkyWay_ = function() {
     var self = this;
 
+
     this.peer = new Peer(this.opts.id, this.opts.peerjs_opts);
 
     // SkyWayサーバーへの接続が完了したら、open イベントを起こす
     this.peer.on('open', function(id) {
-      if(self.opened) {
+      if(this.opened) {
         throw "Error : connection to SkyWay is already opened";
       } else {
-        self.opened = true;
+        this.opened = true;
       }
 
       // id check
@@ -1311,7 +1312,10 @@ new function() {
     this.peer.on("error", function(err) {
       throw "Error : " + err;
     });
-  }
+
+
+
+ }
 
   // 接続中のIDを取得する
   MultiParty_.prototype.getIDs_ = function() {
@@ -1577,7 +1581,7 @@ new function() {
   // peerのvideoのObjectURLを生成し、frontにpeer_msイベントを返す
   MultiParty_.prototype.setupPeerVideo_ = function(peer_id, stream, isReconnect) {
     // prevent to call twice.
-    if(!!this.peers[peer_id].video) return;
+    // if(!!this.peers[peer_id].video) return;
 
     var url = window.URL.createObjectURL(stream);
 
@@ -1757,11 +1761,15 @@ new function() {
     opts.room_id = MultiParty_.util.makeRoomName(seed);
 
     // id check (なかったら生成）
-    if(!opts_.id || typeof(opts_.id) !== "string") {
+    var hash_ = location.pathname + "_peer_id";
+    if(sessionStorage[hash_]) {
+      opts.id = sessionStorage[hash_];
+    } else if(!opts_.id || typeof(opts_.id) !== "string") {
       opts.id = opts.room_id + MultiParty_.util.makeID();
     } else {
       opts.id = opts.room_id + opts_.id;
     }
+    sessionStorage[hash_] = opts.id;
 
     // reliable check (なかったら false)
     if(!opts_.reliable) {
