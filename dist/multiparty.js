@@ -1322,6 +1322,7 @@ new function() {
     var self = this;
 
     self.listAllPeers(function(peers){
+      console.log(peers);
       peers.forEach(function(peer_id){
         self.peers[peer_id] = {};
       });
@@ -1761,8 +1762,10 @@ new function() {
     opts.room_id = MultiParty_.util.makeRoomName(seed);
 
     // id check (なかったら生成）
+    
     var hash_ = location.pathname + "_peer_id";
-    if(sessionStorage[hash_]) {
+    console.log(hash_, sessionStorage[hash_], opts.id);
+    if(!!sessionStorage[hash_]) {
       opts.id = sessionStorage[hash_];
     } else if(!opts_.id || typeof(opts_.id) !== "string") {
       opts.id = opts.room_id + MultiParty_.util.makeID();
@@ -1839,6 +1842,11 @@ new function() {
 
   // video nodeを作る
   MultiParty_.util.createVideoNode = function(video) {
+    // 古いノードが会った場合は削除
+    var prev_node = document.getElementById(video.id);
+    if(prev_node) prev_node.parentNode.removeChild(prev_node);
+
+    // 表示用のビデオノードを作る
     var v_ = document.createElement("video");
     v_.setAttribute("src", video.src);
     v_.setAttribute("id", video.id);
