@@ -1312,9 +1312,6 @@ new function() {
     this.peer.on("error", function(err) {
       throw "Error : " + err;
     });
-
-
-
  }
 
   // 接続中のIDを取得する
@@ -1322,7 +1319,6 @@ new function() {
     var self = this;
 
     self.listAllPeers(function(peers){
-      console.log(peers);
       peers.forEach(function(peer_id){
         self.peers[peer_id] = {};
       });
@@ -1764,7 +1760,6 @@ new function() {
     // id check (なかったら生成）
     
     var hash_ = location.pathname + "_peer_id";
-    console.log(hash_, sessionStorage[hash_], opts.id);
     if(!!sessionStorage[hash_]) {
       opts.id = sessionStorage[hash_];
     } else if(!opts_.id || typeof(opts_.id) !== "string") {
