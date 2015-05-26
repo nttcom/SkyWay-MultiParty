@@ -1335,6 +1335,7 @@ new function() {
 
   // 接続中のIDとサーバのIDを比較して再接続・切断する
   MultiParty_.prototype.startPollingConnections_ = function(){
+    return;
     var self = this;
     self.pollInterval = setInterval(function(){
       self.listAllPeers(function(newList){
@@ -1484,6 +1485,7 @@ new function() {
                 self.screenStream,
                 {metadata:{type:'screen'}}
             );
+            console.log("peer.call called from screenshare startCall_");
             self.peers[peer_id].screen_sender = call;
             self.setupStreamHandler_(call);
           }
@@ -1492,6 +1494,7 @@ new function() {
               peer_id,
               self.stream
           );
+          console.log("peer.call called from generic media exchange startCall_");
           self.peers[peer_id].call = call;
           self.setupStreamHandler_(call);
         }
@@ -1521,6 +1524,7 @@ new function() {
             );
             self.peers[call.peer].screen_sender = call;
           }
+          console.log("peer.call called from call callback");
         }
       });
     }
@@ -1758,7 +1762,7 @@ new function() {
     opts.room_id = MultiParty_.util.makeRoomName(seed);
 
     // id check (なかったら生成）
-    
+
     var hash_ = location.pathname + "_peer_id";
     if(!!sessionStorage[hash_]) {
       opts.id = sessionStorage[hash_];
@@ -1893,6 +1897,7 @@ new function() {
         sc.getScreen(function (stream) {
           self.screenStream = stream;
           self.startCall_(true);
+          util.log("MediaConnection created in OFFER");
 
           //callback use video
           success(stream);
@@ -1952,6 +1957,8 @@ new function() {
             self.stream,
             {metadata: {reconnect: true}}
         );
+
+        console.log("peer.call called from reconnect method");
         peer.call = call;
         self.setupStreamHandler_(call);
       }
@@ -1965,6 +1972,7 @@ new function() {
               self.screenStream,
               {metadata: {reconnect: true, type: 'screen'}}
           );
+          console.log("peer.call called from reconnect method in screenshare");
           peer.screen_sender = call;
         }
       }
