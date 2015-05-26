@@ -1335,7 +1335,6 @@ new function() {
 
   // 接続中のIDとサーバのIDを比較して再接続・切断する
   MultiParty_.prototype.startPollingConnections_ = function(){
-    return;
     var self = this;
     self.pollInterval = setInterval(function(){
       self.listAllPeers(function(newList){
