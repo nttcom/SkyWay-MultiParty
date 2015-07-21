@@ -1,5 +1,7 @@
 # Multi Party
 
+[日本語](./README.md) | [English](./README.en.md)
+
 ## descrption
 
 SkyWay( http://nttcom.github.io/skyway/ )を用い、マルチパーティのビデオチャットを簡単に開発できるライブラリ。
