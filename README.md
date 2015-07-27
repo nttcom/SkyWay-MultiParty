@@ -265,7 +265,6 @@ multiparty.reconnect(peer_id, function({"video": <boolean>, "screen": <boolean>,
 var vNode = MultiParty.util.createVideoNode({"src": object_url, "id": peer_id}){ ... });
 ```
 
+## LICENSE & Copyright
 
-## License
-
-MIT
+[LICENSE](https://github.com/nttcom/SkyWay-MultiParty/blob/master/LICENSE)

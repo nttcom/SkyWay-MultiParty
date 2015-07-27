@@ -269,6 +269,6 @@ var vNode = MultiParty.util.createVideoNode({"src": object_url, "id": peer_id}){
 ```
 
 
-## License
+## LICENSE & Copyright
 
-MIT
+[LICENSE](https://github.com/nttcom/SkyWay-MultiParty/blob/master/LICENSE)
