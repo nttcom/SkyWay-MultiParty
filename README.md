@@ -206,7 +206,7 @@ multiparty.removePeer(peer-id);
 
 ### send
 
-データを送信します。
+peerにデータを送信します。
 
 ```javascript
 multiparty.send(data);
