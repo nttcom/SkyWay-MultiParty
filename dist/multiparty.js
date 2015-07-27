@@ -1888,22 +1888,28 @@ new function() {
 
   // 画面共有を開始する
   MultiParty_.prototype.startScreenShare = function(success, error) {
-    if(this.peer) {
-      var self = this;
-      if(SkyWayPlugin && SkyWayPlugin.ScreenShare) {
-        var sc = new SkyWayPlugin.ScreenShare();
-        sc.setParam(screen.width,screen.height,5);
-        sc.getScreen(function (stream) {
-          self.screenStream = stream;
-          self.startCall_(true);
-          util.log("MediaConnection created in OFFER");
+      if(this.peer) {
+          var self = this;
+          if(SkyWay && SkyWay.ScreenShare) {
+              var sc = new SkyWay.ScreenShare();
+              if(sc.isEnabledExtension()) {
+                  sc.startScreenShare({
+                      Width: screen.width,
+                      Height: screen.height,
+                      FrameRate: 5
+                  },function (stream){
+                      self.screenStream = stream;
+                      self.startCall_(true);
+                      util.log("MediaConnection created in OFFER");
 
-          //callback use video
-          success(stream);
-        }, error);
+                      //callback use video
+                      success(stream);
+                  }, error);
+              }
+          }
       }
-    }
   }
+
 
   // 画面共有を停止する
   MultiParty_.prototype.stopScreenShare = function() {
