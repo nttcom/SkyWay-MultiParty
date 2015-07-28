@@ -47,13 +47,13 @@ multiparty.on('message', function(mesg) {
 
 ## サンプルページ
 
-* https://komasshu-skyway-sample.github.io/plugins/examples/multiparty.html
-( [HTML](https://github.com/komasshu-skyway-sample/plugins/blob/master/examples/multiparty.html) )
+* [http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
+( [HTML](https://github.com/nttcom/SkyWay-MultiParty/blob/master/examples/multiparty-sample.html) )
 
 ## ダウンロード
 
-* [development version](https://raw.githubusercontent.com/komasshu-skyway-sample/plugins/master/multiparty/dist/multiparty.js)
-* [minified version](https://raw.githubusercontent.com/komasshu-skyway-sample/plugins/master/multiparty/dist/multiparty.min.js)
+* [development version](https://skyway.io/dist/multiparty.js)
+* [minified version](https://skyway.io/dist/multiparty.min.js)
 
 ## APIリファレンス
 
