@@ -1,6 +1,6 @@
 {
-  "name": "multiparty",
-  "version": "0.0.0",
+  "name": "SkyWay-MultiParty-Library",
+  "version": "1.0.0",
   "description": "SkyWay library for multi party services",
   "main": "index.js",
   "bin": {
@@ -9,8 +9,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Kensaku Komatsu",
-  "license": "MIT",
+  "author": {
+    "name": "NTT Communications",
+    "email": "skyway@ntt.com"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/nttcom/SkyWay-MultiParty/blob/master/LICENSE"
+    }
+  ],
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-watch": "^0.6.1",
