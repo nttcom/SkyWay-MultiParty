@@ -2,11 +2,9 @@
 
 [日本語](./README.md) | [English](./README.en.md)
 
-## 概要
-
 This is a library for easy implementation of group video chat with SkyWay(http://nttcom.github.io/skyway/).
 
-## サンプル
+## Sample
 
 ```javascript
 // Generate a MultiParty instance.
@@ -45,7 +43,7 @@ multiparty.on('message', function(mesg) {
 });
 ```
 
-## Sample
+## Demo Page
 
 * [http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
 ( [HTML](https://github.com/nttcom/SkyWay-MultiParty/blob/master/examples/multiparty-sample.html) )

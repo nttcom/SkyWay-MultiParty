@@ -2,8 +2,6 @@
 
 [日本語](./README.md) | [English](./README.en.md)
 
-## 概要
-
 SkyWay( http://nttcom.github.io/skyway/ )を用い、多人数参加のグループビデオチャットを簡単に開発できるライブラリです。
 
 ## サンプル
