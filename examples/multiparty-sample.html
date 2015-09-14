@@ -83,6 +83,14 @@
         $("p.receive").append(mesg.data + "<br>");
       });
 
+      ////////////////////////////////
+      // Error handling
+      multiparty.on('error', function(err) {
+        alert(err);
+      });
+
+      multiparty.start();
+
       //////////////////////////////////////////////////////////
       // テキストフォームに入力されたテキストをpeerに送信
       $("#message form").on("submit", function(ev) {
