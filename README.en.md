@@ -41,6 +41,9 @@ $("button").on('click', function(ev) {
 multiparty.on('message', function(mesg) {
   $("p.receive").append(mesg.data + "<br>"); /* Show the received message.  */
 });
+
+// Connect to the server and peers
+multiparty.start()
 ```
 
 ## Demo Page
@@ -100,6 +103,10 @@ var multiparty = new MultiParty([options]);
         * passed to RTCPeerConnection. it indicates custom ICE server configuration. Defaults to ```{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }```.
 
 
+
+### start
+
+Connect to the SkyWay server and all peers.
 
 
 ### multiparty.on
@@ -178,6 +185,12 @@ multiparty.on('dc_close', function(peer-id){ ... });
 * Emitted when data connection has closed with peer.
 * **peer-id** : peer's id.
 
+#### 'error'
+```javascript
+multiparty.on('error', function(error){ ... });
+```
+* Emitted when an error occurs.
+* **error** : Error object.
 
 ### mute
 

@@ -41,6 +41,9 @@ $("button").on('click', function(ev) {
 multiparty.on('message', function(mesg) {
   $("p.receive").append(mesg.data + "<br>"); /* 相手から受信したメッセージを表示 */
 });
+
+// サーバとpeerに接続
+multiparty.start()
 ```
 
 ## サンプルページ
@@ -97,6 +100,10 @@ var multiparty = new MultiParty([options]);
         * true: peerサーバとの接続にTLSを使用する。
     * config (object).
         * RTCPeerConnectionに渡されるオプション。ICEサーバの設定を行うことができる。初期値は```{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }```
+
+### start
+
+SkyWayサーバに接続し、peerに接続します。
 
 ### multiparty.on
 
@@ -175,6 +182,12 @@ multiparty.on('dc_close', function(peer-id){ ... });
 * データコネクションがクローズした際に発生します。
 * **peer-id** : peerのid。
 
+#### 'error'
+```javascript
+multiparty.on('error', function(error){ ... });
+```
+* エラーが起きたら発生します。
+* **error** : 発生したErrorオブジェクト。
 
 ### mute
 
