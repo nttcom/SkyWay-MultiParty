@@ -1757,7 +1757,7 @@ new function() {
 
     // id check (なかったら生成）
 
-    var hash_ = location.pathname + "_peer_id";
+    var hash_ = location.pathname + "_" + opts.room_id + "_peer_id";
     if(!!sessionStorage[hash_]) {
       opts.id = sessionStorage[hash_];
     } else if(!opts_.id || typeof(opts_.id) !== "string") {
