@@ -1,4 +1,4 @@
-/*! multiparty.js build:1.0.0, development. Copyright(c) 2014 Kensaku Komatsu <kensaku.komatsu@gmail.com> */
+/*! multiparty.js build:1.0.0, development. Copyright (c) 2015-2016 NTT Communications Corporation */
 (function(exports){
 /*!
  * EventEmitter2
