@@ -12,7 +12,7 @@ var fs = require('fs')
  * @api private
  */
 
-var template = '/*! multiparty.%ext% build:' + package.version + ', %type%. Copyright(c) 2014 Kensaku Komatsu <kensaku.komatsu@gmail.com> */'
+var template = '/*! multiparty.%ext% build:' + package.version + ', %type%. Copyright (c) 2015-2016 NTT Communications Corporation */'
   , prefix = '\n(function(exports){\n'
   , development = template.replace('%type%', 'development').replace('%ext%', 'js')
   , production = template.replace('%type%', 'production').replace('%ext%', 'min.js')
