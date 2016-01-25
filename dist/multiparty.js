@@ -1346,7 +1346,7 @@ new function() {
           if(removeId) {
             self.removePeer(peer_id);
           } else {
-            var peer = multiparty.peers[peer_id];
+            var peer = self.peers[peer_id];
             var reconnect = {
               video: peer.call?!peer.call.open:false,
               screen: peer.screen_sender?!peer.screen_sender.open:false,
