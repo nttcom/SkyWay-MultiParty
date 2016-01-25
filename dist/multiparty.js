@@ -1917,7 +1917,7 @@ new function() {
   // 画面共有を停止する
   MultiParty_.prototype.stopScreenShare = function() {
     if(this.screenStream){
-      this.screenStream.stop();
+      this.screenStream.getVideoTracks()[0].stop();
       for(var peer_id in this.peers){
         if(this.peers[peer_id].screen_sender) {
           this.peers[peer_id].screen_sender.close()
