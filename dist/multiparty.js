@@ -1547,15 +1547,15 @@ new function() {
       var metadata = this.metadata;
       self.listAllPeers(function(list){
           var isDisconnected = true;
-          var closedScreenShare = !!(metadata && metadata.type === 'screen');
+          var isScreenShare = !!(metadata && metadata.type === 'screen');
           for(var index in list) {
               if(list[index] === peer_id) {
                   isDisconnected = false;
                   break;
               }
           }
-          if(isDisconnected || closedScreenShare){
-              if(closedScreenShare) {
+          if(isDisconnected || isScreenShare){
+              if(isScreenShare) {
                   self.fire_('ss_close', peer_id);
               } else {
                   self.fire_('ms_close', peer_id);
