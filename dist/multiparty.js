@@ -1346,7 +1346,7 @@ new function() {
           if(removeId) {
             self.removePeer(peer_id);
           } else {
-            var peer = multiparty.peers[peer_id];
+            var peer = self.peers[peer_id];
             var reconnect = {
               video: peer.call?!peer.call.open:false,
               screen: peer.screen_sender?!peer.screen_sender.open:false,
@@ -1917,7 +1917,7 @@ new function() {
   // 画面共有を停止する
   MultiParty_.prototype.stopScreenShare = function() {
     if(this.screenStream){
-      this.screenStream.stop();
+      this.screenStream.getVideoTracks()[0].stop();
       for(var peer_id in this.peers){
         if(this.peers[peer_id].screen_sender) {
           this.peers[peer_id].screen_sender.close()
