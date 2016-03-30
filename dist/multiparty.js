@@ -1385,29 +1385,30 @@ new function() {
 
     navigator.getUserMedia_({"video": self.opts.video_stream, "audio": self.opts.audio_stream},
       function(stream) {
-        //Set up AudioContext and gain for browsers that support createMediaStreamSource properly
-        //Use the regular stream directly if it doesn't.
-        var audioContext = new AudioContext();
-        self.gainNode_ = audioContext.createGain();
-        var mic = audioContext.createMediaStreamSource(stream);
-        var peer = audioContext.createMediaStreamDestination();
-        if(peer.stream.addTrack) {
-          mic.connect(self.gainNode_);
-          self.gainNode_.connect(peer);
-          if(stream.getVideoTracks()){
-            peer.stream.addTrack(stream.getVideoTracks()[0]);
+        if(self.opts.audio_stream){
+          //Set up AudioContext and gain for browsers that support createMediaStreamSource properly
+          //Use the regular stream directly if it doesn't.
+          var audioContext = new AudioContext();
+          self.gainNode_ = audioContext.createGain();
+          var mic = audioContext.createMediaStreamSource(stream);
+          var peer = audioContext.createMediaStreamDestination();
+          if(peer.stream.addTrack) {
+            mic.connect(self.gainNode_);
+            self.gainNode_.connect(peer);
+            if(stream.getVideoTracks().length > 0){
+              peer.stream.addTrack(stream.getVideoTracks()[0]);
+            }
+            stream = peer.stream;
           }
-          self.stream = peer.stream;
-        } else {
-          self.stream = stream;
+
+          self.tracks_.audio = stream.getAudioTracks()[0];
         }
 
         if(self.opts.video_stream){
-          self.tracks_.video = self.stream.getVideoTracks()[0];
+          self.tracks_.video = stream.getVideoTracks()[0];
         }
-        if(self.opts.audio_stream){
-          self.tracks_.audio = self.stream.getAudioTracks()[0];
-        }
+
+        self.stream = stream;
 
         self.fire_('my_ms', {"src": URL.createObjectURL(self.stream), "id": self.opts.id});
         self.startCall_();
