@@ -1546,9 +1546,12 @@ new function() {
 
       var peer_id = this.peer;
       var metadata = this.metadata;
+      var isScreenShare = !!(metadata && metadata.type === 'screen');
+      var isSSCaller = 
+        (self.peers[this.peer].screen_sender &&
+         self.peers[this.peer].screen_sender.id === this.id);
       self.listAllPeers(function(list){
           var isDisconnected = true;
-          var isScreenShare = !!(metadata && metadata.type === 'screen');
           for(var index in list) {
               if(list[index] === peer_id) {
                   isDisconnected = false;
@@ -1557,7 +1560,10 @@ new function() {
           }
           if(isDisconnected || isScreenShare){
               if(isScreenShare) {
-                  self.fire_('ss_close', peer_id);
+                  // don't emit ss_close if you're the sender
+                  if (!isSSCaller) {
+                    self.fire_('ss_close', peer_id);
+                  }
               } else {
                   self.fire_('ms_close', peer_id);
               }
