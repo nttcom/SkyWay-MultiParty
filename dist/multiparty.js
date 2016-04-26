@@ -1851,25 +1851,24 @@ new function() {
     var v_ = document.createElement("video");
     v_.setAttribute("src", video.src);
     v_.setAttribute("id", video.id);
-    v_.setAttribute("autoplay", true);
 
     var played = true;
 
-    // v_.addEventListener("loadedmetadata", function(ev) {
-    //   if(!played) {
-    //     played = true;
-    //     this.play();
-    //   }
-    // }, false);
+    v_.addEventListener("loadedmetadata", function(ev) {
+      if(!played) {
+        played = true;
+        this.play();
+      }
+    }, false);
 
-    // // since FF37 sometimes doesn't fire "loadedmetadata"
-    // // work around is after 500msec, calling play();
-    // setTimeout(function(ev){
-    //   if(!played) {
-    //     played = true;
-    //     v_.play();
-    //   }
-    // }, 500);
+    // since FF37 sometimes doesn't fire "loadedmetadata"
+    // work around is after 500msec, calling play();
+    setTimeout(function(ev){
+      if(!played) {
+        played = true;
+        v_.play();
+      }
+    }, 500);
 
     return v_;
   }
