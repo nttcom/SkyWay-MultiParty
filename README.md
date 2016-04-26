@@ -48,7 +48,7 @@ multiparty.start()
 
 ## サンプルページ
 
-* [http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
+* [https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
 ( [HTML](https://github.com/nttcom/SkyWay-MultiParty/blob/master/examples/multiparty-sample.html) )
 
 ## ダウンロード
@@ -144,7 +144,7 @@ multiparty.on('peer_ss', function({"src": <object url>, "id": <peer-id>, "reconn
 * peerのスクリーンキャプチャストリームのセットアップが完了した際に発生します。
 * **src** : peerのスクリーンキャプチャストリームのオブジェクトURL。
 * **id** : peerのid。
-* **reconnect** : 
+* **reconnect** :
 
 #### 'ms_close'
 ```javascript
