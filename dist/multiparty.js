@@ -1852,7 +1852,7 @@ new function() {
     v_.setAttribute("src", video.src);
     v_.setAttribute("id", video.id);
 
-    var played = true;
+    var played = false;
 
     v_.addEventListener("loadedmetadata", function(ev) {
       if(!played) {
