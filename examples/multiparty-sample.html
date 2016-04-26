@@ -40,7 +40,11 @@
       <p class="receive">
       </p>
     </div>
-    <div id="streams"></div>
+    <div id="streams">
+      <div>
+        <button id="video-mute" data-muted="false">video mute</button>
+        <button id="audio-mute" data-muted="false">audio mute</button>
+    </div>
   </body>
 
   <script>
@@ -108,6 +112,20 @@
           multiparty.send(data);
           $text.val("");
         }
+      });
+
+      ///////////////////////////////////////////////////
+      // handle mute/unmute
+      $("#video-mute").on("click", function(ev) {
+        var mute = !$(this).data("muted");
+        multiparty.mute({video: mute});
+        $(this).text("video " + (mute ? "unmute" : "mute")).data("muted", mute);
+      });
+
+      $("#audio-mute").on("click", function(ev) {
+        var mute = !$(this).data("muted");
+        multiparty.mute({audio: mute});
+        $(this).text("audio " + (mute ? "unmute" : "mute")).data("muted", mute);
       });
     }
 

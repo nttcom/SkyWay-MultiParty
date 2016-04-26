@@ -1386,21 +1386,6 @@ new function() {
     navigator.getUserMedia_({"video": self.opts.video_stream, "audio": self.opts.audio_stream},
       function(stream) {
         if(self.opts.audio_stream){
-          //Set up AudioContext and gain for browsers that support createMediaStreamSource properly
-          //Use the regular stream directly if it doesn't.
-          // var audioContext = new AudioContext();
-          // self.gainNode_ = audioContext.createGain();
-          // var mic = audioContext.createMediaStreamSource(stream);
-          // var peer = audioContext.createMediaStreamDestination();
-          // if(peer.stream.addTrack) {
-          //   mic.connect(self.gainNode_);
-          //   self.gainNode_.connect(peer);
-          //   if(stream.getVideoTracks().length > 0){
-          //     peer.stream.addTrack(stream.getVideoTracks()[0]);
-          //   }
-          //   stream = peer.stream;
-          // }
-
           self.tracks_.audio = stream.getAudioTracks()[0];
         }
 
@@ -1420,48 +1405,27 @@ new function() {
   }
 
   // MediaTrackをmuteする
-  MultiParty_.prototype.mute = function(opts) {
-    if(opts === undefined) {
-      this.tracks_.audio.enabled = false;
-      this.tracks_.video.enabled = false;
+  MultiParty_.prototype.mute = function(target_track) {
+    if(typeof(target_track) !== "object") target_track = {video:true, audio:true};
 
-      if(this.gainNode_ !== undefined) {
-        this.gainNode_.gain.value = 0;
-      }
-      return;
+    if(typeof(target_track.audio) !== "undefined") {
+      this.tracks_.audio.enabled = !target_track.audio;
+      this.tracks_.audio.muted = target_track.audio;
     }
-    if(opts.audio !== undefined && opts.audio === true){
-      this.tracks_.audio.enabled = false;
-      this.tracks_.audio.muted = true;
-
-      if(this.gainNode_ !== undefined) {
-        this.gainNode_.gain.value = 0;
-      }
-    }
-    if(opts.video !== undefined && opts.video === true){
-      this.tracks_.video.enabled = false;
+    if(typeof(target_track.video) !== "undefined") {
+      this.tracks_.video.enabled = !target_track.video;
     }
   };
 
-  MultiParty_.prototype.unmute = function(opts) {
-    if(opts === undefined) {
-      this.tracks_.audio.enabled = true;
-      this.tracks_.video.enabled = true;
+  MultiParty_.prototype.unmute = function(target_track) {
+    if(typeof(target_track) !== "object") target_track = {video:true, audio:true};
 
-      if(this.gainNode_ !== undefined) {
-        this.gainNode_.gain.value = 3;
-      }
-      return;
+    if(typeof(target_track.audio) !== "undefined") {
+      this.tracks_.audio.enabled = !!target_track.audio;
+      this.tracks_.audio.muted = !target_track.audio;
     }
-    if(opts.audio !== undefined && opts.audio === true){
-      this.tracks_.audio.enabled = true;
-
-      if(this.gainNode_ !== undefined) {
-        this.gainNode_.gain.value = 3;
-      }
-    }
-    if(opts.video !== undefined && opts.video === true){
-      this.tracks_.video.enabled = true;
+    if(typeof(target_track.video) !== "undefined") {
+      this.tracks_.video.enabled = !!target_track.video;
     }
   };
 
