@@ -1388,18 +1388,18 @@ new function() {
         if(self.opts.audio_stream){
           //Set up AudioContext and gain for browsers that support createMediaStreamSource properly
           //Use the regular stream directly if it doesn't.
-          var audioContext = new AudioContext();
-          self.gainNode_ = audioContext.createGain();
-          var mic = audioContext.createMediaStreamSource(stream);
-          var peer = audioContext.createMediaStreamDestination();
-          if(peer.stream.addTrack) {
-            mic.connect(self.gainNode_);
-            self.gainNode_.connect(peer);
-            if(stream.getVideoTracks().length > 0){
-              peer.stream.addTrack(stream.getVideoTracks()[0]);
-            }
-            stream = peer.stream;
-          }
+          // var audioContext = new AudioContext();
+          // self.gainNode_ = audioContext.createGain();
+          // var mic = audioContext.createMediaStreamSource(stream);
+          // var peer = audioContext.createMediaStreamDestination();
+          // if(peer.stream.addTrack) {
+          //   mic.connect(self.gainNode_);
+          //   self.gainNode_.connect(peer);
+          //   if(stream.getVideoTracks().length > 0){
+          //     peer.stream.addTrack(stream.getVideoTracks()[0]);
+          //   }
+          //   stream = peer.stream;
+          // }
 
           self.tracks_.audio = stream.getAudioTracks()[0];
         }
@@ -1547,7 +1547,7 @@ new function() {
       var peer_id = this.peer;
       var metadata = this.metadata;
       var isScreenShare = !!(metadata && metadata.type === 'screen');
-      var isSSCaller = 
+      var isSSCaller =
         (self.peers[this.peer].screen_sender &&
          self.peers[this.peer].screen_sender.id === this.id);
       self.listAllPeers(function(list){
@@ -1851,24 +1851,25 @@ new function() {
     var v_ = document.createElement("video");
     v_.setAttribute("src", video.src);
     v_.setAttribute("id", video.id);
+    v_.setAttribute("autoplay", true);
 
-    var played = false;
+    var played = true;
 
-    v_.addEventListener("loadedmetadata", function(ev) {
-      if(!played) {
-        played = true;
-        this.play();
-      }
-    }, false);
+    // v_.addEventListener("loadedmetadata", function(ev) {
+    //   if(!played) {
+    //     played = true;
+    //     this.play();
+    //   }
+    // }, false);
 
-    // since FF37 sometimes doesn't fire "loadedmetadata"
-    // work around is after 500msec, calling play();
-    setTimeout(function(ev){
-      if(!played) {
-        played = true;
-        v_.play();
-      }
-    }, 500);
+    // // since FF37 sometimes doesn't fire "loadedmetadata"
+    // // work around is after 500msec, calling play();
+    // setTimeout(function(ev){
+    //   if(!played) {
+    //     played = true;
+    //     v_.play();
+    //   }
+    // }, 500);
 
     return v_;
   }
