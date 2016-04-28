@@ -10,7 +10,7 @@ This is a library for easy implementation of group video chat with SkyWay(http:/
 // Generate a MultiParty instance.
 multiparty = new MultiParty( {
   "key": "********-****-****-****-************"  /* SkyWay key */,
-  "reliable": true /* Use reliable communication(SCTP) in Data Channel. */ 
+  "reliable": true /* Use reliable communication(SCTP) in Data Channel. */
 });
 
 // for MediaStream
@@ -41,11 +41,14 @@ $("button").on('click', function(ev) {
 multiparty.on('message', function(mesg) {
   $("p.receive").append(mesg.data + "<br>"); /* Show the received message.  */
 });
+
+// Connect to the server and peers
+multiparty.start()
 ```
 
 ## Demo Page
 
-* [http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
+* [https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
 ( [HTML](https://github.com/nttcom/SkyWay-MultiParty/blob/master/examples/multiparty-sample.html) )
 
 ## Download
@@ -101,6 +104,10 @@ var multiparty = new MultiParty([options]);
 
 
 
+### start
+
+Connect to the SkyWay server and all peers.
+
 
 ### multiparty.on
 
@@ -113,7 +120,7 @@ multiparty.on(event, callback);
 ```javascript
 multiparty.on('open', function(myid){ ... });
 ```
-* Emitted when a connection to SkyWay server has established. 
+* Emitted when a connection to SkyWay server has established.
 * **id** : id of current window.
 
 #### 'my_ms'
@@ -178,6 +185,12 @@ multiparty.on('dc_close', function(peer-id){ ... });
 * Emitted when data connection has closed with peer.
 * **peer-id** : peer's id.
 
+#### 'error'
+```javascript
+multiparty.on('error', function(error){ ... });
+```
+* Emitted when an error occurs.
+* **error** : Error object.
 
 ### mute
 

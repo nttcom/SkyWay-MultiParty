@@ -41,11 +41,14 @@ $("button").on('click', function(ev) {
 multiparty.on('message', function(mesg) {
   $("p.receive").append(mesg.data + "<br>"); /* 相手から受信したメッセージを表示 */
 });
+
+// サーバとpeerに接続
+multiparty.start()
 ```
 
 ## サンプルページ
 
-* [http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
+* [https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
 ( [HTML](https://github.com/nttcom/SkyWay-MultiParty/blob/master/examples/multiparty-sample.html) )
 
 ## ダウンロード
@@ -98,6 +101,10 @@ var multiparty = new MultiParty([options]);
     * config (object).
         * RTCPeerConnectionに渡されるオプション。ICEサーバの設定を行うことができる。初期値は```{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }```
 
+### start
+
+SkyWayサーバに接続し、peerに接続します。
+
 ### multiparty.on
 
 各種イベント発生時のコールバックを設定できます。
@@ -137,7 +144,7 @@ multiparty.on('peer_ss', function({"src": <object url>, "id": <peer-id>, "reconn
 * peerのスクリーンキャプチャストリームのセットアップが完了した際に発生します。
 * **src** : peerのスクリーンキャプチャストリームのオブジェクトURL。
 * **id** : peerのid。
-* **reconnect** : 
+* **reconnect** :
 
 #### 'ms_close'
 ```javascript
@@ -175,6 +182,12 @@ multiparty.on('dc_close', function(peer-id){ ... });
 * データコネクションがクローズした際に発生します。
 * **peer-id** : peerのid。
 
+#### 'error'
+```javascript
+multiparty.on('error', function(error){ ... });
+```
+* エラーが起きたら発生します。
+* **error** : 発生したErrorオブジェクト。
 
 ### mute
 

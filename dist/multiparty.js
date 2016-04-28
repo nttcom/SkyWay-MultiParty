@@ -1,4 +1,4 @@
-/*! multiparty.js build:0.0.0, development. Copyright(c) 2014 Kensaku Komatsu <kensaku.komatsu@gmail.com> */
+/*! multiparty.js build:1.0.0, development. Copyright (c) 2015-2016 NTT Communications Corporation */
 (function(exports){
 /*!
  * EventEmitter2
@@ -1254,7 +1254,6 @@ new function() {
     this.peers = {}; // peer Objects
     this.stream = null; // my media stream
     this.tracks_ = {};
-    this.gainNode_;
     this.pollInterval = null;
 
     this.opened = false;
@@ -1262,11 +1261,6 @@ new function() {
     // option をチェック
     // room, myid, key プロパティを割り当てる
     this.opts = MultiParty_.util.checkOpts_(opts);
-
-    var self = this;
-    setTimeout(function(ev){
-      self.conn2SkyWay_();
-    }, 0);
   }
 
   // EventEmitterを継承する
@@ -1310,7 +1304,7 @@ new function() {
 
     // SkyWayサーバーへの接続が失敗した場合のerror処理
     this.peer.on("error", function(err) {
-      throw "Error : " + err;
+      self.fire_('error', err)
     });
  }
 
@@ -1351,7 +1345,7 @@ new function() {
           if(removeId) {
             self.removePeer(peer_id);
           } else {
-            var peer = multiparty.peers[peer_id];
+            var peer = self.peers[peer_id];
             var reconnect = {
               video: peer.call?!peer.call.open:false,
               screen: peer.screen_sender?!peer.screen_sender.open:false,
@@ -1390,83 +1384,55 @@ new function() {
 
     navigator.getUserMedia_({"video": self.opts.video_stream, "audio": self.opts.audio_stream},
       function(stream) {
-        //Set up AudioContext and gain for browsers that support createMediaStreamSource properly
-        //Use the regular stream directly if it doesn't.
-        var audioContext = new AudioContext();
-        self.gainNode_ = audioContext.createGain();
-        var mic = audioContext.createMediaStreamSource(stream);
-        var peer = audioContext.createMediaStreamDestination();
-        if(peer.stream.addTrack) {
-          mic.connect(self.gainNode_);
-          self.gainNode_.connect(peer);
-          if(stream.getVideoTracks()){
-            peer.stream.addTrack(stream.getVideoTracks()[0]);
-          }
-          self.stream = peer.stream;
-        } else {
-          self.stream = stream;
+        if(self.opts.audio_stream){
+          self.tracks_.audio = stream.getAudioTracks()[0];
         }
 
         if(self.opts.video_stream){
-          self.tracks_.video = self.stream.getVideoTracks()[0];
+          self.tracks_.video = stream.getVideoTracks()[0];
         }
-        if(self.opts.audio_stream){
-          self.tracks_.audio = self.stream.getAudioTracks()[0];
-        }
+
+        self.stream = stream;
 
         self.fire_('my_ms', {"src": URL.createObjectURL(self.stream), "id": self.opts.id});
         self.startCall_();
 
       }, function(err) {
-        throw err;
+        self.fire_('error', err)
       }
     );
   }
 
-  // MediaTrackをmuteする
-  MultiParty_.prototype.mute = function(opts) {
-    if(opts === undefined) {
-      this.tracks_.audio.enabled = false;
-      this.tracks_.video.enabled = false;
+  // mute either media and audio track
+  //
+  //
+  // snipet.
+  // ```
+  // multiparty.mute({audio: true});  // only audio becomes mute, so callee becomes not to hear about caller voice.
+  // ```
+  MultiParty_.prototype.mute = function(target_track /* {"video": boolean, "audio": boolean} */) {
+    // if parameter **target_track** does not proper value. We forcibly set both mute.
+    if( typeof(target_track) !== "object" ) { target_track = {video:true, audio:true}; }
 
-      if(this.gainNode_ !== undefined) {
-        this.gainNode_.gain.value = 0;
-      }
-      return;
-    }
-    if(opts.audio !== undefined && opts.audio === true){
-      this.tracks_.audio.enabled = false;
-      this.tracks_.audio.muted = true;
-
-      if(this.gainNode_ !== undefined) {
-        this.gainNode_.gain.value = 0;
-      }
-    }
-    if(opts.video !== undefined && opts.video === true){
-      this.tracks_.video.enabled = false;
-    }
+    // make each stream mute based on parameter
+    if( typeof(target_track.audio) !== "undefined" ) { this.tracks_.audio.enabled = !target_track.audio; }
+    if( typeof(target_track.video) !== "undefined" ) { this.tracks_.video.enabled = !target_track.video; }
   };
 
-  MultiParty_.prototype.unmute = function(opts) {
-    if(opts === undefined) {
-      this.tracks_.audio.enabled = true;
-      this.tracks_.video.enabled = true;
+  // unmute either media and audio track
+  //
+  //
+  // snipet.
+  // ```
+  // multiparty.unmute({audio: true});  // only audio becomes unmute, so caller's face cannot be seen from callee side.
+  // ```
+  MultiParty_.prototype.unmute = function(target_track /* {"video": boolean, "audio": boolean} */) {
+    // if parameter **target_track** does not proper value. We forcibly set both unmute.
+    if( typeof(target_track) !== "object") { target_track = {video:true, audio:true}; }
 
-      if(this.gainNode_ !== undefined) {
-        this.gainNode_.gain.value = 3;
-      }
-      return;
-    }
-    if(opts.audio !== undefined && opts.audio === true){
-      this.tracks_.audio.enabled = true;
-
-      if(this.gainNode_ !== undefined) {
-        this.gainNode_.gain.value = 3;
-      }
-    }
-    if(opts.video !== undefined && opts.video === true){
-      this.tracks_.video.enabled = true;
-    }
+    // make each stream unmute based on parameter
+    if( typeof(target_track.audio) !== "undefined") { this.tracks_.audio.enabled = !!target_track.audio; }
+    if( typeof(target_track.video) !== "undefined") { this.tracks_.video.enabled = !!target_track.video; }
   };
 
 
@@ -1550,6 +1516,10 @@ new function() {
 
       var peer_id = this.peer;
       var metadata = this.metadata;
+      var isScreenShare = !!(metadata && metadata.type === 'screen');
+      var isSSCaller =
+        (self.peers[this.peer].screen_sender &&
+         self.peers[this.peer].screen_sender.id === this.id);
       self.listAllPeers(function(list){
           var isDisconnected = true;
           for(var index in list) {
@@ -1558,9 +1528,12 @@ new function() {
                   break;
               }
           }
-          if(isDisconnected){
-              if(metadata && metadata.type === 'screen') {
-                  self.fire_('ss_close', peer_id);
+          if(isDisconnected || isScreenShare){
+              if(isScreenShare) {
+                  // don't emit ss_close if you're the sender
+                  if (!isSSCaller) {
+                    self.fire_('ss_close', peer_id);
+                  }
               } else {
                   self.fire_('ms_close', peer_id);
               }
@@ -1687,7 +1660,7 @@ new function() {
           }
         }
         if(isDisconnected){
-          self.fire_('dc_close', this.peer);
+          self.fire_('dc_close', peer_id);
           // check if user has any other open connections
           if(self.peers[peer_id] &&
             (self.peers[peer_id].call === undefined || !self.peers[peer_id].call.open) &&
@@ -1762,7 +1735,7 @@ new function() {
 
     // id check (なかったら生成）
 
-    var hash_ = location.pathname + "_peer_id";
+    var hash_ = location.pathname + "_" + opts.room_id + "_peer_id";
     if(!!sessionStorage[hash_]) {
       opts.id = sessionStorage[hash_];
     } else if(!opts_.id || typeof(opts_.id) !== "string") {
@@ -1876,6 +1849,14 @@ new function() {
   ////////////////////////////////////
   // public method
 
+  MultiParty_.prototype.start = function() {
+    var self = this;
+    setTimeout(function(){
+      self.conn2SkyWay_();
+    }, 0);
+    return self;
+  }
+
   MultiParty_.prototype.send = function(data) {
     if(this.peer) this.send_(data);
   }
@@ -1914,7 +1895,7 @@ new function() {
   // 画面共有を停止する
   MultiParty_.prototype.stopScreenShare = function() {
     if(this.screenStream){
-      this.screenStream.stop();
+      this.screenStream.getVideoTracks()[0].stop();
       for(var peer_id in this.peers){
         if(this.peers[peer_id].screen_sender) {
           this.peers[peer_id].screen_sender.close()
