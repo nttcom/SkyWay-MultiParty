@@ -10,7 +10,7 @@ This is a library for easy implementation of group video chat with SkyWay(http:/
 // Generate a MultiParty instance.
 multiparty = new MultiParty( {
   "key": "********-****-****-****-************"  /* SkyWay key */,
-  "reliable": true /* Use reliable communication(SCTP) in Data Channel. */ 
+  "reliable": true /* Use reliable communication(SCTP) in Data Channel. */
 });
 
 // for MediaStream
@@ -48,7 +48,7 @@ multiparty.start()
 
 ## Demo Page
 
-* [http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](http://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
+* [https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
 ( [HTML](https://github.com/nttcom/SkyWay-MultiParty/blob/master/examples/multiparty-sample.html) )
 
 ## Download
@@ -120,7 +120,7 @@ multiparty.on(event, callback);
 ```javascript
 multiparty.on('open', function(myid){ ... });
 ```
-* Emitted when a connection to SkyWay server has established. 
+* Emitted when a connection to SkyWay server has established.
 * **id** : id of current window.
 
 #### 'my_ms'

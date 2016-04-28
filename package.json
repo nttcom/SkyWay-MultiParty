@@ -7,7 +7,8 @@
     "multiparty": "build.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "example-test": "webpack-dev-server --port 8081 --https --content-base ./"
   },
   "author": {
     "name": "NTT Communications",
