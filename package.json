@@ -1,14 +1,11 @@
 {
   "name": "SkyWay-MultiParty-Library",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "SkyWay library for multi party services",
-  "main": "index.js",
-  "bin": {
-    "multiparty": "build.js"
-  },
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "example-test": "webpack-dev-server --port 8081 --https --content-base ./"
+    "webpack-dev-server": "webpack-dev-server --port 8081 --https --content-base ./"
   },
   "author": {
     "name": "NTT Communications",
@@ -21,11 +18,18 @@
     }
   ],
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-shell": "^1.1.2",
+    "babel-core": "^6.17.0",
+    "babel-loader": "^6.2.5",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-es2015": "^6.16.0",
+    "json-loader": "^0.5.4",
+    "nock": "^9.0.2",
+    "webpack": "^1.13.2",
     "mocha": "^1.21.4",
-    "should": "^4.0.4",
-    "uglify-js": "~1.3.4"
+    "should": "^4.0.4"
+  },
+  "dependencies": {
+    "events": "^1.1.1",
+    "md5": "^2.2.1"
   }
 }

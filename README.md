@@ -46,6 +46,12 @@ multiparty.on('message', function(mesg) {
 multiparty.start()
 ```
 
+## サンプルページ(local test)
+
+1. ``examples/multiparty-sample.html`` の57行目 'key' プロパティを各自のAPIKEYに変更
+2. ``$ npm install``
+3. ``$ npm run webpack-dev-server``
+
 ## サンプルページ
 
 * [https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)

@@ -46,6 +46,12 @@ multiparty.on('message', function(mesg) {
 multiparty.start()
 ```
 
+## Demo page(local test)
+
+1. update your own APIKEY in line 57 of ``examples/multiparty-sample.html``.
+2. ``$ npm install``
+3. ``$ npm run webpack-dev-server``
+
 ## Demo Page
 
 * [https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
