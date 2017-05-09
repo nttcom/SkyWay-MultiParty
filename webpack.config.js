@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 
-const path = require('path')
+const path = require('path');
 let _entry;
 
 switch(process.env.NODE_ENV) {
@@ -20,22 +20,24 @@ module.exports = {
     filename: process.env.NODE_ENV === "production" ? "[name].min.js" : "[name].js"
   },
   module: {
-    preLoaders: [
-      { test: /\.json$/, exclude: /node_modules/, loader: 'json'  }
-    ],
-    loaders: [
+    rules: [
+      { test: /\.json$/,
+        exclude: /node_modules/,
+        loader: 'json',
+        enforce: 'pre'
+      },
       {
         test: /\.(js)?$/,
         exclude: /(node_modules)/,
-        loader: 'babel', // 'babel-loader' is also a legal name to reference
+        loader: 'babel-loader',
         query: {
           presets: ['es2015']
         }
-      },
+      }
     ]
   },
   resolve: {
-    extensions: ['', '.js']
+    extensions: ['*', '.js']
   },
   plugins: [
   ]
