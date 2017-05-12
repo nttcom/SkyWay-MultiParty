@@ -1,6 +1,6 @@
 {
   "name": "skyway-multiparty",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "SkyWay js library for multi party apps",
   "homepage": "https://github.com/nttcom/SkyWay-MultiParty",
   "main": "lib/index.js",
