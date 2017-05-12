@@ -1,32 +1,32 @@
-# Multi Party
+# SkyWay MultiParty
 
-[日本語](./README.md) | [English](./README.en.md)
+[日本語](./README.ja.md) | [English](./README.md)
 
-SkyWay( http://nttcom.github.io/skyway/ )を用い、多人数参加のグループビデオチャットを簡単に開発できるライブラリです。
+This is a library for easy implementation of group video chat with SkyWay(http://nttcom.github.io/skyway/).
 
-## サンプル
+## Sample
 
 ```javascript
-// MultiParty インスタンスを生成
+// Generate a MultiParty instance.
 multiparty = new MultiParty( {
-  "key": "********-****-****-****-************"  /* SkyWay keyを指定 */,
-  "reliable": true /* data channel でreliable通信(sctp)を行う */
+  "key": "********-****-****-****-************"  /* SkyWay key */,
+  "reliable": true /* Use reliable communication(SCTP) in Data Channel. */
 });
 
 // for MediaStream
 //
 
 multiparty.on('my_ms', function(video) {
-  // 自分のvideoを表示
+  // Show my video.
   var vNode = MultiParty.util.createVideoNode(video);
   vNode.volume = 0;
   $(vNode).appendTo("#streams");
 }).on('peer_ms', function(video) {
-  // peerのvideoを表示
+  // Show peer's video.
   var vNode = MultiParty.util.createVideoNode(video);
   $(vNode).appendTo("#streams");
 }).on('ms_close', function(peer_id) {
-  // peerが切れたら、対象のvideoノードを削除する
+  // Remove the video node when peer is disconnected.
   $("#"+peer_id).remove();
 })
 
@@ -35,34 +35,42 @@ multiparty.on('my_ms', function(video) {
 //
 
 $("button").on('click', function(ev) {
-  multiparty.send('hello'); /* 接続中のピアにメッセージを送信 */
+  multiparty.send('hello'); /* Send message to the connected peers. */
 });
 
 multiparty.on('message', function(mesg) {
-  $("p.receive").append(mesg.data + "<br>"); /* 相手から受信したメッセージを表示 */
+  $("p.receive").append(mesg.data + "<br>"); /* Show the received message.  */
 });
 
-// サーバとpeerに接続
+// Connect to the server and peers
 multiparty.start()
 ```
 
-## サンプルページ(local test)
+## Demo page(local test)
 
-1. ``examples/multiparty-sample.html`` の57行目 'key' プロパティを各自のAPIKEYに変更
+1. update your own APIKEY in line 57 of ``examples/multiparty-sample.html``.
 2. ``$ npm install``
 3. ``$ npm run webpack-dev-server``
 
-## サンプルページ
+## Demo Page
 
 * [https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html](https://nttcom.github.io/SkyWay-MultiParty/examples/multiparty-sample.html)
 ( [HTML](https://github.com/nttcom/SkyWay-MultiParty/blob/master/examples/multiparty-sample.html) )
 
-## ダウンロード
+## Installing with NPM
+
+```bash
+$ npm install skyway-multiparty
+```
+
+You need to install [SkyWay branch peerjs](https://github.com/nttcom/peerjs/) as well.
+
+## Download
 
 * [development version](https://skyway.io/dist/multiparty.js)
 * [minified version](https://skyway.io/dist/multiparty.min.js)
 
-## APIリファレンス
+## API reference
 
 ### MultiParty
 
@@ -71,49 +79,52 @@ var multiparty = new MultiParty([options]);
 ```
 
 
-* options
+- options
     * key (string)
-        * API key([skyway](https://skyway.io/ds/)から取得)。**必須**。
+        * an API key obtained from [SkyWay Web Site](https://skyway.io/ds/)
     * room (string)
-        * ルーム名。
+        * room name
     *  id (string)
-        * ユーザID。
+        * user id
     * reliable (boolean)
-        * **true** : データチャンネルで信頼性のあるデータ転送を行う。デフォルト値はfalse。
+        * **true** indicates reliable data transfer (data channel). ```default : false```
     * selialization (string)
-        * データシリアライゼーションモードを( binary | binary-utf8 | json | none )のいずれかにセットする。デフォルト値はbinary。
+        * set data selialization mode ( binary | binary-utf8 | json | none ). ```default : binary```
     * video (boolean)
-        * **true** : ビデオストリーミングを許可する。デフォルト値はtrue。
+        * **true** indicates video streaming is enabled.```default: true```
     * audio (boolean)
-        * **true** : オーディオストリーミングを許可する。デフォルト値はtrue。
+        * **true** indicates audio streaming is enabled. ```default: true```
     * polling (boolean)
-        * **true** : サーバポーリングによるユーザリストのチェックを許可する。デフォルト値はtrue。
+        * **true** indicates check user list via server polling. ```default: true```
     * polling_interval (number)
-        * ポーリング間隔(msec)を設定する。デフォルト値は3000。
+        * polling interval in msec order. ```default: 3000```
     * debug (number)
-        * コンソールに表示されるデバッグログレベルを設定する。
+        * debug log level appeared in console.
+
     ```
-    0 ログを表示ない
-    1 エラーだけ表示
-    2 エラーと警告だけ表示
-    3 すべてのログを表示
+    0 Prints no logs.
+    1 Prints only errors.
+    2 Prints errors and warnings.
+    3 Prints all logs.
     ```
     * host (string)
-        * peerサーバのホスト名。
+        * peer server host name.
     * port (number)
-        * peerサーバのポート番号。
+        * peer server port number.
     * secure (boolean)
-        * true: peerサーバとの接続にTLSを使用する。
-    * config (object).
-        * RTCPeerConnectionに渡されるオプション。ICEサーバの設定を行うことができる。初期値は```{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }```
+        * true means peer server provide tls.
+    * config (object)
+        * passed to RTCPeerConnection. it indicates custom ICE server configuration. Defaults to ```{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }```.
+
+
 
 ### start
 
-SkyWayサーバに接続し、peerに接続します。
+Connect to the SkyWay server and all peers.
+
 
 ### multiparty.on
 
-各種イベント発生時のコールバックを設定できます。
 
 ```javascript
 multiparty.on(event, callback);
@@ -123,81 +134,81 @@ multiparty.on(event, callback);
 ```javascript
 multiparty.on('open', function(myid){ ... });
 ```
-* SkyWayサーバとのコネクションが確立した際に発生します。
-* **id** : 現在のウィンドウのid
+* Emitted when a connection to SkyWay server has established.
+* **id** : id of current window.
 
 #### 'my_ms'
 ```javascript
 multiparty.on('my_ms', function({"src": <object url>, "id": <myid>}){...});
 ```
-* このウィンドウのvideo/audioストリームのセットアップが完了した際に発生します。
-* **object url** : キャプチャされたストリームのurl。
-* **id** : 現在のウィンドウのid。
+* Emitted when this window's video/audio stream has setuped. **object url** is the url for captured stream. **id** is current window's id.
+* **object url** : url for captured stream.
+* **id** : current window's id.
 
 #### 'peer_ms'
 ```javascript
 multiparty.on('peer_ms', function({"src": <object url>, "id": <peer-id>, "reconnect": <true or false>}){ ... });
 ```
-* peerのvideo/audioストリームのセットアップが完了した際に発生します。
-* **src** : peerのストリームのオブジェクトURL。
-* **id** : peerのid。
-* **reconnect** : reconnectメソッドにより再接続された場合はtrueとなる。
+* Emitted when peer's av stream has setuped.
+* **src** : Object URL of peer's stream.
+* **id** : peer's id.
+* **reconnect** :  **true** when connected via reconnect method.
 
 #### 'peer_ss'
 ```javascript
 multiparty.on('peer_ss', function({"src": <object url>, "id": <peer-id>, "reconnect": <true or false>}){ ... });
 ```
-* peerのスクリーンキャプチャストリームのセットアップが完了した際に発生します。
-* **src** : peerのスクリーンキャプチャストリームのオブジェクトURL。
-* **id** : peerのid。
-* **reconnect** :
+* Emitted when peer's screen captrure stream has setuped.
+* **src** : Object URL of peer's screen capture stream.
+* **id** :  peer's id.
+* **reconnect** : **true** when connected via reconnect method.
 
 #### 'ms_close'
 ```javascript
 multiparty.on('ms_close', function(peer-id){ ... });
 ```
-* peerのメディアストリームがクローズした際に発生します。
-* **peer-id** : peerのid。
+* Emitted when peer's media stream has closed.
+* **peer-id** : peer's id.
 
 #### 'ss_close'
 ```javascript
 multiparty.on('ss_close', function(peer-id){ ... });
 ```
-* peerのスクリーンキャストストリームがクローズした際に発生します。
-* **peer-id** : peerのid。
+* Emitted when peer's screen cast stream has closed.
+* **peer-id** : peer's id.
 
 #### 'dc_open'
 ```javascript
 multiparty.on('dc_open', function(peer-id){ ... });
 ```
-* データチャンネルのコネクションのセットアップが完了した際に発生します。
-* **peer-id** : peerのid。
+* Emitted when the connection for data channel with peer is setuped.
+* **peer-id** : peer's id.
 
 #### 'message'
 ```javascript
 multiparty.on('message', function({"id": <peer-id>, "data": <data>}){ ... });
 ```
-* peerからメッセージを受信した際に発生します。
-* **peer-id** : peerのid。
-* **data** : 受信したデータ。
+* Emitted when receive message from peer.
+* **peer-id** : peer's id.
+* **data** : Received data.
 
 #### 'dc_close'
 ```javascript
 multiparty.on('dc_close', function(peer-id){ ... });
 ```
-* データコネクションがクローズした際に発生します。
-* **peer-id** : peerのid。
+* Emitted when data connection has closed with peer.
+* **peer-id** : peer's id.
 
 #### 'error'
 ```javascript
 multiparty.on('error', function(error){ ... });
 ```
-* エラーが起きたら発生します。
-* **error** : 発生したErrorオブジェクト。
+* Emitted when an error occurs.
+* **error** : Error object.
 
 ### mute
 
-自分の映像と音声をミュートすることができます。
+Mute current video/audio.
 
 ```javascript
 multiparty.mute({"video": <true of false>, "audio": <true or false>);
@@ -206,7 +217,7 @@ multiparty.mute({"video": <true of false>, "audio": <true or false>);
 
 ### unmute
 
-自分の映像と音声をアンミュートすることができます。
+Unmute current video/audio.
 
 ```javascript
 multiparty.unmute({"video": <true of false>, "audio": <true or false>);
@@ -215,7 +226,7 @@ multiparty.unmute({"video": <true of false>, "audio": <true or false>);
 
 ### removePeer
 
-peerのメディアストリームとデータストリームをクローズします。
+Close peer's media stream and data stream.
 
 ```javascript
 multiparty.removePeer(peer-id);
@@ -223,7 +234,7 @@ multiparty.removePeer(peer-id);
 
 ### send
 
-peerにデータを送信します。
+Send data to every peer.
 
 ```javascript
 multiparty.send(data);
@@ -232,7 +243,7 @@ multiparty.send(data);
 
 ### close
 
-コネクションを全て切断します。
+Close every connection.
 
 ```javascript
 multiparty.close();
@@ -240,7 +251,7 @@ multiparty.close();
 
 ### startScreenShare
 
-画面共有を開始します。
+Start screen share.
 
 ```javascript
 multiparty.startScreenShare(function(stream){
@@ -252,7 +263,7 @@ multiparty.startScreenShare(function(stream){
 
 ### stopScreenShare
 
-画面共有を中断します。
+Stop screen share.
 
 ```javascript
 multiparty.stopScreenShare();
@@ -260,7 +271,7 @@ multiparty.stopScreenShare();
 
 ### listAllPeers
 
-接続しているpeerのidを取得します。
+Get all of the connected peer ids.
 
 ```javascript
 multiparty.listAllPeers(function(lists) { ... });
@@ -268,7 +279,7 @@ multiparty.listAllPeers(function(lists) { ... });
 
 ### reconnect
 
-なんらかの原因でコネクションが切れてしまったpeerに再接続を行います。
+Reconnect the disconnected peer.
 
 ```javascript
 multiparty.reconnect(peer_id, function({"video": <boolean>, "screen": <boolean>, "data": <boolean>}){ ... });
@@ -276,11 +287,12 @@ multiparty.reconnect(peer_id, function({"video": <boolean>, "screen": <boolean>,
 
 ### MultiParty.util.createVideoNode
 
-オブジェクトURLからビデオノードを生成できます。
+Create video node from Object URL.
 
 ```javascript
 var vNode = MultiParty.util.createVideoNode({"src": object_url, "id": peer_id}){ ... });
 ```
+
 
 ## LICENSE & Copyright
 

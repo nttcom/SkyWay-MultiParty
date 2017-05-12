@@ -1,7 +1,7 @@
 {
-  "name": "SkyWay-MultiParty-Library",
-  "version": "1.0.1",
-  "description": "SkyWay library for multi party services",
+  "name": "skyway-multiparty",
+  "version": "1.0.2",
+  "description": "SkyWay js library for multi party apps",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
