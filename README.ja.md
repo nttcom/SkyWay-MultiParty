@@ -1,6 +1,6 @@
 # SkyWay MultiParty
 
-[日本語](./README.ja.md) | [English](./README.md)
+[日本語](https://github.com/nttcom/SkyWay-MultiParty/blob/master/README.ja.md) | [English](https://github.com/nttcom/SkyWay-MultiParty/blob/master/README.md)
 
 SkyWay( http://nttcom.github.io/skyway/ )を用い、多人数参加のグループビデオチャットを簡単に開発できるライブラリです。
 
@@ -48,9 +48,12 @@ multiparty.start()
 
 ## サンプルページ(local test)
 
-1. ``examples/multiparty-sample.html`` の57行目 'key' プロパティを各自のAPIKEYに変更
+1. ``examples/multiparty-sample.html`` の57行目 'key' プロパティを各自のAPIKEYに変更（このとき、``localhost``をAPIKEYに登録してください）
 2. ``$ npm install``
 3. ``$ npm run webpack-dev-server``
+4. https://localhost:8081/examples/multiparty-sample.html を二つのブラウザウィンドウで開いてください
+
+APIKEYは、https://skyway.io/ds/ に開発者登録することで入手できます。
 
 ## サンプルページ
 
@@ -63,7 +66,11 @@ multiparty.start()
 $ npm install skyway-multiparty
 ```
 
-[SkyWay branch peerjs](https://github.com/nttcom/peerjs/) のインストールも必要です。
+### webpackなどで利用する場合
+
+```js
+const MultiParty = require('skyway-multiparty')
+```
 
 ## ダウンロード
 

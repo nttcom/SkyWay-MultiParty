@@ -6,7 +6,7 @@ let _entry;
 switch(process.env.NODE_ENV) {
   default:
     _entry = {
-      "multiparty": "./lib/index.js"
+      "multiparty": path.join(__dirname, "lib/index.js")
     };
     break;
 }

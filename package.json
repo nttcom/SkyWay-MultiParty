@@ -1,20 +1,22 @@
 {
   "name": "skyway-multiparty",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "SkyWay js library for multi party apps",
   "homepage": "https://github.com/nttcom/SkyWay-MultiParty",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nttcom/SkyWay-MultiParty.git"
+  },
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack-dev-server": "webpack-dev-server --port 8081 --https --content-base ./"
   },
   "bugs": {
-    "url": "https://github.com/nttcom/SkyWay-MultiParty/issues",
-    "email": "skyway@ntt.com"
+    "url": "https://github.com/nttcom/SkyWay-MultiParty/issues"
   },
   "author": {
     "name": "NTT Communications",
-    "email": "skyway@ntt.com",
     "url": "http://skyway.io"
   },
   "licenses": [
@@ -37,6 +39,7 @@
   },
   "dependencies": {
     "events": "^1.1.1",
-    "md5": "^2.2.1"
+    "md5": "^2.2.1",
+    "skyway-peerjs": "^0.4.0"
   }
 }

@@ -1,6 +1,6 @@
 # SkyWay MultiParty
 
-[日本語](./README.ja.md) | [English](./README.md)
+[日本語](https://github.com/nttcom/SkyWay-MultiParty/blob/master/README.ja.md) | [English](https://github.com/nttcom/SkyWay-MultiParty/blob/master/README.md)
 
 This is a library for easy implementation of group video chat with SkyWay(http://nttcom.github.io/skyway/).
 
@@ -48,9 +48,12 @@ multiparty.start()
 
 ## Demo page(local test)
 
-1. update your own APIKEY in line 57 of ``examples/multiparty-sample.html``.
+1. update your own APIKEY in line 57 of ``examples/multiparty-sample.html``. (Please be sure that ``localhost`` is registered in your APIKEY setting)
 2. ``$ npm install``
 3. ``$ npm run webpack-dev-server``
+4. open https://localhost:8081/examples/multiparty-sample.html in two browser window.
+
+In case you don't have APIKEY, please sign-up SkyWay account and obtain API key at https://skyway.io/ds/.
 
 ## Demo Page
 
@@ -63,7 +66,11 @@ multiparty.start()
 $ npm install skyway-multiparty
 ```
 
-You need to install [SkyWay branch peerjs](https://github.com/nttcom/peerjs/) as well.
+### Using with webpack etc.
+
+```js
+const MultiParty = require('skyway-multiparty')
+```
 
 ## Download
 
