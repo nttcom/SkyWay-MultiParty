@@ -1,6 +1,12 @@
-# SkyWay MultiParty
+[日本語](https://github.com/nttcom/SkyWay-MultiParty/blob/master/README.ja.md) | English
 
-[日本語](https://github.com/nttcom/SkyWay-MultiParty/blob/master/README.ja.md) | [English](https://github.com/nttcom/SkyWay-MultiParty/blob/master/README.md)
+# Deprecated!
+
+We have released a new WebRTC platform, [ECLWebRTC](https://webrtc.ecl.ntt.com/en/?origin=skyway), to take the place of SkyWay. We will be shutting down the SkyWay servers in March 2018. Customers who are currently using SkyWay are required to migrate to ECLWebRTC by then or their services will stop working.
+
+If you are looking for the repository of ECLWebRTC, please use [MeshRoom class](https://webrtc.ecl.ntt.com/en/js-reference/MeshRoom.html) and [SFURoom Class](https://webrtc.ecl.ntt.com/en/js-reference/SFURoom.html).
+
+# SkyWay MultiParty
 
 This is a library for easy implementation of group video chat with SkyWay(http://nttcom.github.io/skyway/).
 
