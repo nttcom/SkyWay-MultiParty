@@ -1,6 +1,12 @@
-# SkyWay MultiParty
+日本語 | [English](https://github.com/nttcom/SkyWay-MultiParty/blob/master/README.md)
 
-[日本語](https://github.com/nttcom/SkyWay-MultiParty/blob/master/README.ja.md) | [English](https://github.com/nttcom/SkyWay-MultiParty/blob/master/README.md)
+# Deprecated!
+
+このレポジトリは、2018年3月に提供を終了する旧SkyWayのJavaScript SDK向けMultiPartyライブラリです。[新しいSkyWay](https://webrtc.ecl.ntt.com/?origin=skyway)への移行をお願いします。
+
+すでに新しいSkyWayをご利用の方は、[MeshRoomクラス](https://webrtc.ecl.ntt.com/js-reference/MeshRoom.html)および[SFURoomクラス](https://webrtc.ecl.ntt.com/js-reference/SFURoom.html)をご利用ください。
+
+# SkyWay MultiParty
 
 SkyWay( http://nttcom.github.io/skyway/ )を用い、多人数参加のグループビデオチャットを簡単に開発できるライブラリです。
 
